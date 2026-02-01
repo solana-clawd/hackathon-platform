@@ -40,7 +40,7 @@ export default function ClaimPage({ params }: { params: { code: string } }) {
       <div className="card">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">🔗</div>
-          <h1 className="text-2xl font-bold mb-2">Claim Your Agent</h1>
+          <h1 className="text-2xl font-bold mb-2 text-white">Claim Your Agent</h1>
           <p className="text-sol-gray text-sm">
             Verify ownership by providing your email or Twitter handle.
           </p>
