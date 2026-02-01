@@ -4,11 +4,10 @@ import { sql } from '@vercel/postgres';
 import { authenticateAgent } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-utils';
 import { v4 as uuidv4 } from 'uuid';
-import { seedDatabase } from '@/lib/seed';
+
 
 export async function GET(request: NextRequest) {
   try {
-    await seedDatabase();
     await getDb();
     const { searchParams } = new URL(request.url);
     const track = searchParams.get('track');

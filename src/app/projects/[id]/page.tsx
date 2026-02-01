@@ -1,6 +1,6 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
 import { sql } from '@vercel/postgres';
-import { seedDatabase } from '@/lib/seed';
+
 import VoteButton from '@/components/VoteButton';
 import DatabaseError from '@/components/DatabaseError';
 import Link from 'next/link';
@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
   try {
-    await seedDatabase();
     await getDb();
 
     const projectResult = await sql`SELECT p.*, t.name as team_name, h.name as hackathon_name

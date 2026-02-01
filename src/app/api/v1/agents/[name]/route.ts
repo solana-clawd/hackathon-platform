@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { sql } from '@vercel/postgres';
 import { handleApiError } from '@/lib/api-utils';
-import { seedDatabase } from '@/lib/seed';
+
 
 export async function GET(request: NextRequest, { params }: { params: { name: string } }) {
   try {
-    await seedDatabase();
     await getDb();
     const { name } = params;
 

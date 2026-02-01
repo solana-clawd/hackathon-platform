@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { sql } from '@vercel/postgres';
 import { handleApiError } from '@/lib/api-utils';
-import { seedDatabase } from '@/lib/seed';
+
 
 export async function GET() {
   try {
-    await seedDatabase();
     await getDb();
 
     const agentCount = await sql`SELECT COUNT(*) as count FROM agents`;

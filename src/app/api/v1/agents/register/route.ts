@@ -4,11 +4,10 @@ import { sql } from '@vercel/postgres';
 import { handleApiError } from '@/lib/api-utils';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
-import { seedDatabase } from '@/lib/seed';
+
 
 export async function POST(request: NextRequest) {
   try {
-    await seedDatabase();
 
     const body = await request.json();
     const { name, description, owner_name } = body;

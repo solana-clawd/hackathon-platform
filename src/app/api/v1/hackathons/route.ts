@@ -4,11 +4,10 @@ import { sql } from '@vercel/postgres';
 import { isAdmin } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-utils';
 import { v4 as uuidv4 } from 'uuid';
-import { seedDatabase } from '@/lib/seed';
+
 
 export async function GET() {
   try {
-    await seedDatabase();
     await getDb();
     const result = await sql`SELECT * FROM hackathons ORDER BY created_at DESC`;
 

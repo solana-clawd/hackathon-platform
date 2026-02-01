@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
 import { sql } from '@vercel/postgres';
-import { seedDatabase } from '@/lib/seed';
+
 import ProjectCard from '@/components/ProjectCard';
 import HackathonCard from '@/components/HackathonCard';
 import DatabaseError from '@/components/DatabaseError';
@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   try {
-    await seedDatabase();
     await getDb();
 
     const agentCount = await sql`SELECT COUNT(*) as c FROM agents`;

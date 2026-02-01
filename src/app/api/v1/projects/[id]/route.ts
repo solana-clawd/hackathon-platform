@@ -3,11 +3,10 @@ import { getDb } from '@/lib/db';
 import { sql } from '@vercel/postgres';
 import { authenticateAgent, isAdmin } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-utils';
-import { seedDatabase } from '@/lib/seed';
+
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await seedDatabase();
     await getDb();
 
     const projectResult = await sql`SELECT p.*, t.name as team_name, h.name as hackathon_name
