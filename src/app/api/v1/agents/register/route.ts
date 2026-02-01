@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { handleApiError } from '@/lib/api-utils';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import { seedDatabase } from '@/lib/seed';
@@ -45,8 +46,7 @@ export async function POST(request: NextRequest) {
       claim_url: `/claim/${claimCode}`,
       message: 'Agent registered successfully. Use the API key for all authenticated requests. Share the claim URL with the human owner for verification.',
     }, { status: 201 });
-  } catch (error: unknown) {
-    console.error('Registration error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error);
   }
 }

@@ -3,10 +3,24 @@ import { createClient, Client } from '@libsql/client';
 let _client: Client | null = null;
 let _initialized = false;
 
+export class DatabaseNotConfiguredError extends Error {
+  constructor() {
+    super('Database not configured. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables.');
+    this.name = 'DatabaseNotConfiguredError';
+  }
+}
+
+export function isDatabaseConfigured(): boolean {
+  return !!(process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN);
+}
+
 export function getClient(): Client {
   if (!_client) {
+    if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) {
+      throw new DatabaseNotConfiguredError();
+    }
     _client = createClient({
-      url: process.env.TURSO_DATABASE_URL || 'file:hackathon.db',
+      url: process.env.TURSO_DATABASE_URL,
       authToken: process.env.TURSO_AUTH_TOKEN,
     });
   }
@@ -20,6 +34,20 @@ export async function getDb(): Promise<Client> {
     _initialized = true;
   }
   return client;
+}
+
+export async function checkDbHealth(): Promise<{ ok: boolean; latencyMs: number; error?: string }> {
+  try {
+    if (!isDatabaseConfigured()) {
+      return { ok: false, latencyMs: 0, error: 'TURSO_DATABASE_URL and TURSO_AUTH_TOKEN not set' };
+    }
+    const start = Date.now();
+    const client = await getDb();
+    await client.execute('SELECT 1');
+    return { ok: true, latencyMs: Date.now() - start };
+  } catch (err: unknown) {
+    return { ok: false, latencyMs: 0, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
 }
 
 async function initDb(client: Client) {

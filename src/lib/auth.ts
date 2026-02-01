@@ -1,4 +1,4 @@
-import { getDb } from './db';
+import { getDb, DatabaseNotConfiguredError } from './db';
 import { NextRequest } from 'next/server';
 
 export interface Agent {
@@ -33,6 +33,8 @@ export async function authenticateAgent(request: NextRequest): Promise<Agent | n
 
   return agent || null;
 }
+
+export { DatabaseNotConfiguredError };
 
 // Admin check - first registered agent or specific key
 const ADMIN_KEY = process.env.ADMIN_API_KEY || 'hk_admin_secret';

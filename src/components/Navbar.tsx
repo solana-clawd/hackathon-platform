@@ -9,6 +9,7 @@ export default function Navbar() {
   const links = [
     { href: '/hackathons', label: 'Hackathons' },
     { href: '/projects', label: 'Projects' },
+    { href: '/agents', label: 'Agents' },
     { href: '/leaderboard', label: 'Leaderboard' },
     { href: '/docs', label: 'API Docs' },
   ];
