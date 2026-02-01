@@ -1,23 +1,30 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import { createClient, Client } from '@libsql/client';
 
-const DB_PATH = path.join(process.cwd(), 'hackathon.db');
+let _client: Client | null = null;
+let _initialized = false;
 
-let _db: Database.Database | null = null;
-
-export function getDb(): Database.Database {
-  if (!_db) {
-    _db = new Database(DB_PATH);
-    _db.pragma('journal_mode = WAL');
-    _db.pragma('foreign_keys = ON');
-    initDb(_db);
+export function getClient(): Client {
+  if (!_client) {
+    _client = createClient({
+      url: process.env.TURSO_DATABASE_URL || 'file:hackathon.db',
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
   }
-  return _db;
+  return _client;
 }
 
-function initDb(db: Database.Database) {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS agents (
+export async function getDb(): Promise<Client> {
+  const client = getClient();
+  if (!_initialized) {
+    await initDb(client);
+    _initialized = true;
+  }
+  return client;
+}
+
+async function initDb(client: Client) {
+  await client.batch([
+    `CREATE TABLE IF NOT EXISTS agents (
       id TEXT PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
       description TEXT,
@@ -30,9 +37,8 @@ function initDb(db: Database.Database) {
       karma INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       last_active DATETIME
-    );
-
-    CREATE TABLE IF NOT EXISTS hackathons (
+    )`,
+    `CREATE TABLE IF NOT EXISTS hackathons (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       description TEXT,
@@ -42,26 +48,23 @@ function initDb(db: Database.Database) {
       prizes TEXT,
       status TEXT DEFAULT 'upcoming',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS teams (
+    )`,
+    `CREATE TABLE IF NOT EXISTS teams (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       hackathon_id TEXT REFERENCES hackathons(id),
       invite_code TEXT UNIQUE,
       created_by TEXT REFERENCES agents(id),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS team_members (
+    )`,
+    `CREATE TABLE IF NOT EXISTS team_members (
       team_id TEXT REFERENCES teams(id),
       agent_id TEXT REFERENCES agents(id),
       role TEXT DEFAULT 'member',
       joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (team_id, agent_id)
-    );
-
-    CREATE TABLE IF NOT EXISTS projects (
+    )`,
+    `CREATE TABLE IF NOT EXISTS projects (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       description TEXT,
@@ -77,28 +80,26 @@ function initDb(db: Database.Database) {
       judge_score REAL DEFAULT 0,
       submitted_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS votes (
+    )`,
+    `CREATE TABLE IF NOT EXISTS votes (
       agent_id TEXT REFERENCES agents(id),
       project_id TEXT REFERENCES projects(id),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (agent_id, project_id)
-    );
-
-    CREATE TABLE IF NOT EXISTS updates (
+    )`,
+    `CREATE TABLE IF NOT EXISTS updates (
       id TEXT PRIMARY KEY,
       project_id TEXT REFERENCES projects(id),
       content TEXT,
       week_number INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
+    )`,
+  ], 'write');
 }
 
 // Helper to check if seed data exists
-export function isSeeded(): boolean {
-  const db = getDb();
-  const row = db.prepare('SELECT COUNT(*) as count FROM hackathons').get() as { count: number };
-  return row.count > 0;
+export async function isSeeded(): Promise<boolean> {
+  const client = await getDb();
+  const result = await client.execute('SELECT COUNT(*) as count FROM hackathons');
+  return (result.rows[0].count as number) > 0;
 }

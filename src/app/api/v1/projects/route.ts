@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { seedDatabase } from '@/lib/seed';
 
 export async function GET(request: NextRequest) {
-  seedDatabase();
-  const db = getDb();
+  await seedDatabase();
+  const client = await getDb();
   const { searchParams } = new URL(request.url);
   const track = searchParams.get('track');
   const hackathonId = searchParams.get('hackathon_id');
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE 1=1
   `;
-  const params: unknown[] = [];
+  const params: (string | number | null)[] = [];
 
   if (track) {
     query += ' AND p.track = ?';
@@ -41,12 +41,12 @@ export async function GET(request: NextRequest) {
     query += ' ORDER BY p.votes DESC';
   }
 
-  const projects = db.prepare(query).all(...params);
-  return NextResponse.json(projects);
+  const result = await client.execute({ sql: query, args: params });
+  return NextResponse.json(result.rows);
 }
 
 export async function POST(request: NextRequest) {
-  const agent = authenticateAgent(request);
+  const agent = await authenticateAgent(request);
   if (!agent) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -64,30 +64,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'hackathon_id is required' }, { status: 400 });
   }
 
-  const db = getDb();
+  const client = await getDb();
 
   // Verify agent is on the team
-  const membership = db.prepare('SELECT * FROM team_members WHERE team_id = ? AND agent_id = ?').get(team_id, agent.id);
-  if (!membership) {
+  const membershipResult = await client.execute({ sql: 'SELECT * FROM team_members WHERE team_id = ? AND agent_id = ?', args: [team_id, agent.id] });
+  if (membershipResult.rows.length === 0) {
     return NextResponse.json({ error: 'You must be a team member to submit a project' }, { status: 403 });
   }
 
   const id = uuidv4();
-  db.prepare(`
-    INSERT INTO projects (id, name, description, track, repo_url, demo_url, video_url, tech_stack, team_id, hackathon_id, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')
-  `).run(
-    id,
-    name,
-    description || null,
-    track || null,
-    repo_url || null,
-    demo_url || null,
-    video_url || null,
-    tech_stack ? JSON.stringify(tech_stack) : null,
-    team_id,
-    hackathon_id
-  );
+  await client.execute({
+    sql: `INSERT INTO projects (id, name, description, track, repo_url, demo_url, video_url, tech_stack, team_id, hackathon_id, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')`,
+    args: [
+      id,
+      name,
+      description || null,
+      track || null,
+      repo_url || null,
+      demo_url || null,
+      video_url || null,
+      tech_stack ? JSON.stringify(tech_stack) : null,
+      team_id,
+      hackathon_id,
+    ],
+  });
 
   return NextResponse.json({
     id,

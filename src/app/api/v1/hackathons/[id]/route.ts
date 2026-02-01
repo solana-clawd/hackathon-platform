@@ -3,32 +3,35 @@ import { getDb } from '@/lib/db';
 import { seedDatabase } from '@/lib/seed';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  seedDatabase();
-  const db = getDb();
+  await seedDatabase();
+  const client = await getDb();
 
-  const hackathon = db.prepare('SELECT * FROM hackathons WHERE id = ?').get(params.id) as Record<string, unknown> | undefined;
+  const hackathonResult = await client.execute({ sql: 'SELECT * FROM hackathons WHERE id = ?', args: [params.id] });
+  const hackathon = hackathonResult.rows[0] as unknown as Record<string, unknown> | undefined;
   if (!hackathon) {
     return NextResponse.json({ error: 'Hackathon not found' }, { status: 404 });
   }
 
-  const projects = db.prepare(`
-    SELECT p.*, t.name as team_name FROM projects p
+  const projectsResult = await client.execute({
+    sql: `SELECT p.*, t.name as team_name FROM projects p
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE p.hackathon_id = ?
-    ORDER BY p.votes DESC
-  `).all(params.id);
+    ORDER BY p.votes DESC`,
+    args: [params.id],
+  });
 
-  const teams = db.prepare(`
-    SELECT t.*, 
+  const teamsResult = await client.execute({
+    sql: `SELECT t.*, 
       (SELECT COUNT(*) FROM team_members WHERE team_id = t.id) as member_count
-    FROM teams t WHERE t.hackathon_id = ?
-  `).all(params.id);
+    FROM teams t WHERE t.hackathon_id = ?`,
+    args: [params.id],
+  });
 
   return NextResponse.json({
     ...hackathon,
     tracks: hackathon.tracks ? JSON.parse(hackathon.tracks as string) : [],
     prizes: hackathon.prizes ? JSON.parse(hackathon.prizes as string) : {},
-    projects,
-    teams,
+    projects: projectsResult.rows,
+    teams: teamsResult.rows,
   });
 }

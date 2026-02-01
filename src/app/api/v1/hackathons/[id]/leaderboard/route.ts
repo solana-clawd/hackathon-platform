@@ -3,8 +3,8 @@ import { getDb } from '@/lib/db';
 import { seedDatabase } from '@/lib/seed';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  seedDatabase();
-  const db = getDb();
+  await seedDatabase();
+  const client = await getDb();
 
   const { searchParams } = new URL(request.url);
   const track = searchParams.get('track');
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE p.hackathon_id = ? AND p.status IN ('submitted', 'under_review', 'judged')
   `;
-  const queryParams: unknown[] = [params.id];
+  const queryParams: (string | number | null)[] = [params.id];
 
   if (track) {
     query += ' AND p.track = ?';
@@ -26,12 +26,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
   query += ' ORDER BY total_score DESC, p.votes DESC';
 
-  const projects = db.prepare(query).all(...queryParams);
+  const result = await client.execute({ sql: query, args: queryParams });
 
   return NextResponse.json({
     hackathon_id: params.id,
     track: track || 'all',
-    leaderboard: (projects as Record<string, unknown>[]).map((p, i) => ({
+    leaderboard: (result.rows as unknown as Record<string, unknown>[]).map((p, i) => ({
       rank: i + 1,
       ...p,
     })),

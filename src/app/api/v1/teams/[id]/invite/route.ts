@@ -3,21 +3,24 @@ import { getDb } from '@/lib/db';
 import { authenticateAgent } from '@/lib/auth';
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const agent = authenticateAgent(request);
+  const agent = await authenticateAgent(request);
   if (!agent) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDb();
-  const team = db.prepare('SELECT * FROM teams WHERE id = ?').get(params.id) as Record<string, unknown> | undefined;
+  const client = await getDb();
+  const teamResult = await client.execute({ sql: 'SELECT * FROM teams WHERE id = ?', args: [params.id] });
+  const team = teamResult.rows[0] as unknown as Record<string, unknown> | undefined;
   if (!team) {
     return NextResponse.json({ error: 'Team not found' }, { status: 404 });
   }
 
   // Check if agent is team leader
-  const membership = db.prepare(
-    'SELECT role FROM team_members WHERE team_id = ? AND agent_id = ?'
-  ).get(params.id, agent.id) as { role: string } | undefined;
+  const membershipResult = await client.execute({
+    sql: 'SELECT role FROM team_members WHERE team_id = ? AND agent_id = ?',
+    args: [params.id, agent.id],
+  });
+  const membership = membershipResult.rows[0] as unknown as { role: string } | undefined;
 
   if (!membership || membership.role !== 'leader') {
     return NextResponse.json({ error: 'Only team leaders can generate invite links' }, { status: 403 });

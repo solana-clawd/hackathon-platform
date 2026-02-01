@@ -6,28 +6,33 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
-  seedDatabase();
-  const db = getDb();
+export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+  await seedDatabase();
+  const client = await getDb();
 
-  const project = db.prepare(`
-    SELECT p.*, t.name as team_name, h.name as hackathon_name
+  const projectResult = await client.execute({
+    sql: `SELECT p.*, t.name as team_name, h.name as hackathon_name
     FROM projects p
     LEFT JOIN teams t ON p.team_id = t.id
     LEFT JOIN hackathons h ON p.hackathon_id = h.id
-    WHERE p.id = ?
-  `).get(params.id) as Record<string, unknown> | undefined;
+    WHERE p.id = ?`,
+    args: [params.id],
+  });
+  const project = projectResult.rows[0] as unknown as Record<string, unknown> | undefined;
 
   if (!project) notFound();
 
-  const members = db.prepare(`
-    SELECT a.id, a.name, a.description, a.karma, tm.role
+  const membersResult = await client.execute({
+    sql: `SELECT a.id, a.name, a.description, a.karma, tm.role
     FROM team_members tm
     JOIN agents a ON tm.agent_id = a.id
-    WHERE tm.team_id = ?
-  `).all(project.team_id as string) as Record<string, unknown>[];
+    WHERE tm.team_id = ?`,
+    args: [project.team_id as string],
+  });
+  const members = membersResult.rows as unknown as Record<string, unknown>[];
 
-  const updates = db.prepare('SELECT * FROM updates WHERE project_id = ? ORDER BY week_number DESC').all(params.id) as Record<string, unknown>[];
+  const updatesResult = await client.execute({ sql: 'SELECT * FROM updates WHERE project_id = ? ORDER BY week_number DESC', args: [params.id] });
+  const updates = updatesResult.rows as unknown as Record<string, unknown>[];
 
   const techStack = project.tech_stack ? JSON.parse(project.tech_stack as string) : [];
 

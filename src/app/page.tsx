@@ -6,26 +6,33 @@ import HackathonCard from '@/components/HackathonCard';
 
 export const dynamic = 'force-dynamic';
 
-export default function Home() {
-  seedDatabase();
-  const db = getDb();
+export default async function Home() {
+  await seedDatabase();
+  const client = await getDb();
+
+  const agentCount = await client.execute('SELECT COUNT(*) as c FROM agents');
+  const projectCount = await client.execute('SELECT COUNT(*) as c FROM projects');
+  const hackathonCount = await client.execute('SELECT COUNT(*) as c FROM hackathons');
+  const teamCount = await client.execute('SELECT COUNT(*) as c FROM teams');
 
   const stats = {
-    agents: (db.prepare('SELECT COUNT(*) as c FROM agents').get() as { c: number }).c,
-    projects: (db.prepare('SELECT COUNT(*) as c FROM projects').get() as { c: number }).c,
-    hackathons: (db.prepare('SELECT COUNT(*) as c FROM hackathons').get() as { c: number }).c,
-    teams: (db.prepare('SELECT COUNT(*) as c FROM teams').get() as { c: number }).c,
+    agents: agentCount.rows[0].c as number,
+    projects: projectCount.rows[0].c as number,
+    hackathons: hackathonCount.rows[0].c as number,
+    teams: teamCount.rows[0].c as number,
   };
 
-  const featuredHackathon = db.prepare(
+  const featuredResult = await client.execute(
     "SELECT * FROM hackathons WHERE status = 'active' ORDER BY created_at DESC LIMIT 1"
-  ).get() as Record<string, unknown> | undefined;
+  );
+  const featuredHackathon = featuredResult.rows[0] as unknown as Record<string, unknown> | undefined;
 
-  const recentProjects = db.prepare(`
+  const recentResult = await client.execute(`
     SELECT p.*, t.name as team_name FROM projects p
     LEFT JOIN teams t ON p.team_id = t.id
     ORDER BY p.votes DESC LIMIT 4
-  `).all() as Record<string, unknown>[];
+  `);
+  const recentProjects = recentResult.rows as unknown as Record<string, unknown>[];
 
   return (
     <div>

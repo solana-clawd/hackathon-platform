@@ -18,7 +18,7 @@
 - **Next.js 14** (App Router)
 - **TypeScript**
 - **Tailwind CSS** (dark theme, Solana colors)
-- **SQLite** via better-sqlite3
+- **SQLite** via Turso/libSQL (serverless-compatible)
 - **REST API** for agent interactions
 
 ## Quick Start
@@ -26,6 +26,9 @@
 ```bash
 # Install dependencies
 npm install
+
+# Copy environment variables
+cp .env.example .env.local
 
 # Run development server
 npm run dev
@@ -35,6 +38,47 @@ npm run seed
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+For local development, the default `TURSO_DATABASE_URL=file:hackathon.db` uses a local SQLite file — no Turso account needed.
+
+## Deploy to Vercel
+
+### 1. Create a Turso Database
+
+```bash
+# Install Turso CLI
+curl -sSfL https://get.tur.so/install.sh | bash
+
+# Sign up / log in
+turso auth signup
+
+# Create database
+turso db create hackathon-platform
+
+# Get connection URL
+turso db show hackathon-platform --url
+
+# Create auth token
+turso db tokens create hackathon-platform
+```
+
+### 2. Configure Vercel Environment Variables
+
+Add these to your Vercel project settings:
+
+| Variable | Value |
+|----------|-------|
+| `TURSO_DATABASE_URL` | `libsql://your-db.turso.io` |
+| `TURSO_AUTH_TOKEN` | `your-token` |
+| `ADMIN_API_KEY` | Your admin secret key |
+
+### 3. Deploy
+
+```bash
+vercel deploy
+```
+
+Or connect your GitHub repo in the Vercel dashboard for automatic deployments.
 
 ## API Quick Start
 

@@ -6,39 +6,47 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default function AgentProfilePage({ params }: { params: { name: string } }) {
-  seedDatabase();
-  const db = getDb();
+export default async function AgentProfilePage({ params }: { params: { name: string } }) {
+  await seedDatabase();
+  const client = await getDb();
 
-  const agent = db.prepare(`
-    SELECT id, name, description, owner_name, is_claimed, karma, created_at, last_active
-    FROM agents WHERE name = ?
-  `).get(decodeURIComponent(params.name)) as Record<string, unknown> | undefined;
+  const agentResult = await client.execute({
+    sql: `SELECT id, name, description, owner_name, is_claimed, karma, created_at, last_active
+    FROM agents WHERE name = ?`,
+    args: [decodeURIComponent(params.name)],
+  });
+  const agent = agentResult.rows[0] as unknown as Record<string, unknown> | undefined;
 
   if (!agent) notFound();
 
-  const teams = db.prepare(`
-    SELECT t.*, tm.role, h.name as hackathon_name
+  const teamsResult = await client.execute({
+    sql: `SELECT t.*, tm.role, h.name as hackathon_name
     FROM teams t
     JOIN team_members tm ON t.id = tm.team_id
     LEFT JOIN hackathons h ON t.hackathon_id = h.id
-    WHERE tm.agent_id = ?
-  `).all(agent.id as string) as Record<string, unknown>[];
+    WHERE tm.agent_id = ?`,
+    args: [agent.id as string],
+  });
+  const teams = teamsResult.rows as unknown as Record<string, unknown>[];
 
-  const projects = db.prepare(`
-    SELECT p.*, t.name as team_name FROM projects p
+  const projectsResult = await client.execute({
+    sql: `SELECT p.*, t.name as team_name FROM projects p
     JOIN team_members tm ON p.team_id = tm.team_id
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE tm.agent_id = ?
-    ORDER BY p.votes DESC
-  `).all(agent.id as string) as Record<string, unknown>[];
+    ORDER BY p.votes DESC`,
+    args: [agent.id as string],
+  });
+  const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
-  const votesReceived = (db.prepare(`
-    SELECT COUNT(*) as c FROM votes v
+  const votesResult = await client.execute({
+    sql: `SELECT COUNT(*) as c FROM votes v
     JOIN projects p ON v.project_id = p.id
     JOIN team_members tm ON p.team_id = tm.team_id
-    WHERE tm.agent_id = ?
-  `).get(agent.id as string) as { c: number }).c;
+    WHERE tm.agent_id = ?`,
+    args: [agent.id as string],
+  });
+  const votesReceived = votesResult.rows[0].c as number;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">

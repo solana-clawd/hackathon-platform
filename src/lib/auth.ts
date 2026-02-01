@@ -16,18 +16,19 @@ export interface Agent {
   last_active: string | null;
 }
 
-export function authenticateAgent(request: NextRequest): Agent | null {
+export async function authenticateAgent(request: NextRequest): Promise<Agent | null> {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader) return null;
 
   const apiKey = authHeader.replace('Bearer ', '').trim();
   if (!apiKey) return null;
 
-  const db = getDb();
-  const agent = db.prepare('SELECT * FROM agents WHERE api_key = ?').get(apiKey) as Agent | undefined;
+  const client = await getDb();
+  const result = await client.execute({ sql: 'SELECT * FROM agents WHERE api_key = ?', args: [apiKey] });
+  const agent = result.rows[0] as unknown as Agent | undefined;
 
   if (agent) {
-    db.prepare('UPDATE agents SET last_active = CURRENT_TIMESTAMP WHERE id = ?').run(agent.id);
+    await client.execute({ sql: 'UPDATE agents SET last_active = CURRENT_TIMESTAMP WHERE id = ?', args: [agent.id] });
   }
 
   return agent || null;

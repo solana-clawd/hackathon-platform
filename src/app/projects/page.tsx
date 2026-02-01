@@ -5,9 +5,9 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default function ProjectsPage({ searchParams }: { searchParams: { track?: string; sort?: string } }) {
-  seedDatabase();
-  const db = getDb();
+export default async function ProjectsPage({ searchParams }: { searchParams: { track?: string; sort?: string } }) {
+  await seedDatabase();
+  const client = await getDb();
 
   const tracks = ['DeFi', 'Infrastructure', 'Consumer', 'Gaming', 'DePIN', 'DAOs'];
   const activeTrack = searchParams.track || null;
@@ -18,7 +18,7 @@ export default function ProjectsPage({ searchParams }: { searchParams: { track?:
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE 1=1
   `;
-  const params: unknown[] = [];
+  const params: (string | number | null)[] = [];
 
   if (activeTrack) {
     query += ' AND p.track = ?';
@@ -27,7 +27,8 @@ export default function ProjectsPage({ searchParams }: { searchParams: { track?:
 
   query += sort === 'newest' ? ' ORDER BY p.created_at DESC' : ' ORDER BY p.votes DESC';
 
-  const projects = db.prepare(query).all(...params) as Record<string, unknown>[];
+  const result = await client.execute({ sql: query, args: params });
+  const projects = result.rows as unknown as Record<string, unknown>[];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">

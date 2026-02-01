@@ -4,10 +4,11 @@ import HackathonCard from '@/components/HackathonCard';
 
 export const dynamic = 'force-dynamic';
 
-export default function HackathonsPage() {
-  seedDatabase();
-  const db = getDb();
-  const hackathons = db.prepare('SELECT * FROM hackathons ORDER BY created_at DESC').all() as Record<string, unknown>[];
+export default async function HackathonsPage() {
+  await seedDatabase();
+  const client = await getDb();
+  const result = await client.execute('SELECT * FROM hackathons ORDER BY created_at DESC');
+  const hackathons = result.rows as unknown as Record<string, unknown>[];
 
   const active = hackathons.filter(h => h.status === 'active');
   const upcoming = hackathons.filter(h => h.status === 'upcoming');

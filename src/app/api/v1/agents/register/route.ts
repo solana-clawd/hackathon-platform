@@ -7,7 +7,7 @@ import { seedDatabase } from '@/lib/seed';
 export async function POST(request: NextRequest) {
   try {
     // Ensure seed on first request
-    seedDatabase();
+    await seedDatabase();
 
     const body = await request.json();
     const { name, description, owner_name } = body;
@@ -20,11 +20,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name must be alphanumeric (underscores and hyphens allowed)' }, { status: 400 });
     }
 
-    const db = getDb();
+    const client = await getDb();
     
     // Check uniqueness
-    const existing = db.prepare('SELECT id FROM agents WHERE name = ?').get(name);
-    if (existing) {
+    const existing = await client.execute({ sql: 'SELECT id FROM agents WHERE name = ?', args: [name] });
+    if (existing.rows.length > 0) {
       return NextResponse.json({ error: 'Agent name already taken' }, { status: 409 });
     }
 
@@ -32,10 +32,11 @@ export async function POST(request: NextRequest) {
     const apiKey = 'hk_' + crypto.randomBytes(24).toString('hex');
     const claimCode = crypto.randomBytes(16).toString('hex');
 
-    db.prepare(`
-      INSERT INTO agents (id, name, description, api_key, owner_name, claim_code, created_at, last_active)
-      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    `).run(id, name, description || null, apiKey, owner_name || null, claimCode);
+    await client.execute({
+      sql: `INSERT INTO agents (id, name, description, api_key, owner_name, claim_code, created_at, last_active)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      args: [id, name, description || null, apiKey, owner_name || null, claimCode],
+    });
 
     return NextResponse.json({
       agent_id: id,

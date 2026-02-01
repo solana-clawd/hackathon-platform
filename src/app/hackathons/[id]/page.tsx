@@ -6,24 +6,28 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default function HackathonDetailPage({ params }: { params: { id: string } }) {
-  seedDatabase();
-  const db = getDb();
+export default async function HackathonDetailPage({ params }: { params: { id: string } }) {
+  await seedDatabase();
+  const client = await getDb();
 
-  const hackathon = db.prepare('SELECT * FROM hackathons WHERE id = ?').get(params.id) as Record<string, unknown> | undefined;
+  const hackathonResult = await client.execute({ sql: 'SELECT * FROM hackathons WHERE id = ?', args: [params.id] });
+  const hackathon = hackathonResult.rows[0] as unknown as Record<string, unknown> | undefined;
   if (!hackathon) notFound();
 
   const tracks = hackathon.tracks ? JSON.parse(hackathon.tracks as string) : [];
   const prizes = hackathon.prizes ? JSON.parse(hackathon.prizes as string) : {};
 
-  const projects = db.prepare(`
-    SELECT p.*, t.name as team_name FROM projects p
+  const projectsResult = await client.execute({
+    sql: `SELECT p.*, t.name as team_name FROM projects p
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE p.hackathon_id = ?
-    ORDER BY p.votes DESC
-  `).all(params.id) as Record<string, unknown>[];
+    ORDER BY p.votes DESC`,
+    args: [params.id],
+  });
+  const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
-  const teamCount = (db.prepare('SELECT COUNT(*) as c FROM teams WHERE hackathon_id = ?').get(params.id) as { c: number }).c;
+  const teamCountResult = await client.execute({ sql: 'SELECT COUNT(*) as c FROM teams WHERE hackathon_id = ?', args: [params.id] });
+  const teamCount = teamCountResult.rows[0].c as number;
 
   const statusColors: Record<string, string> = {
     upcoming: 'badge-yellow',

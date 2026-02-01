@@ -3,34 +3,37 @@ import { getDb } from '@/lib/db';
 import { authenticateAgent } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
-  const agent = authenticateAgent(request);
+  const agent = await authenticateAgent(request);
   if (!agent) {
     return NextResponse.json({ error: 'Unauthorized. Provide Bearer token in Authorization header.' }, { status: 401 });
   }
 
-  const db = getDb();
+  const client = await getDb();
 
   // Get teams
-  const teams = db.prepare(`
-    SELECT t.*, tm.role FROM teams t 
+  const teamsResult = await client.execute({
+    sql: `SELECT t.*, tm.role FROM teams t 
     JOIN team_members tm ON t.id = tm.team_id 
-    WHERE tm.agent_id = ?
-  `).all(agent.id);
+    WHERE tm.agent_id = ?`,
+    args: [agent.id],
+  });
 
   // Get projects (via teams)
-  const projects = db.prepare(`
-    SELECT p.* FROM projects p 
+  const projectsResult = await client.execute({
+    sql: `SELECT p.* FROM projects p 
     JOIN team_members tm ON p.team_id = tm.team_id 
-    WHERE tm.agent_id = ?
-  `).all(agent.id);
+    WHERE tm.agent_id = ?`,
+    args: [agent.id],
+  });
 
   // Get vote count received
-  const voteCount = db.prepare(`
-    SELECT COUNT(*) as count FROM votes v
+  const voteResult = await client.execute({
+    sql: `SELECT COUNT(*) as count FROM votes v
     JOIN projects p ON v.project_id = p.id
     JOIN team_members tm ON p.team_id = tm.team_id
-    WHERE tm.agent_id = ?
-  `).get(agent.id) as { count: number };
+    WHERE tm.agent_id = ?`,
+    args: [agent.id],
+  });
 
   return NextResponse.json({
     id: agent.id,
@@ -41,14 +44,14 @@ export async function GET(request: NextRequest) {
     karma: agent.karma,
     created_at: agent.created_at,
     last_active: agent.last_active,
-    teams,
-    projects,
-    votes_received: voteCount.count,
+    teams: teamsResult.rows,
+    projects: projectsResult.rows,
+    votes_received: voteResult.rows[0].count as number,
   });
 }
 
 export async function PATCH(request: NextRequest) {
-  const agent = authenticateAgent(request);
+  const agent = await authenticateAgent(request);
   if (!agent) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -56,12 +59,12 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const { description } = body;
 
-  const db = getDb();
+  const client = await getDb();
   
   if (description !== undefined) {
-    db.prepare('UPDATE agents SET description = ? WHERE id = ?').run(description, agent.id);
+    await client.execute({ sql: 'UPDATE agents SET description = ? WHERE id = ?', args: [description, agent.id] });
   }
 
-  const updated = db.prepare('SELECT * FROM agents WHERE id = ?').get(agent.id);
-  return NextResponse.json(updated);
+  const updated = await client.execute({ sql: 'SELECT * FROM agents WHERE id = ?', args: [agent.id] });
+  return NextResponse.json(updated.rows[0]);
 }

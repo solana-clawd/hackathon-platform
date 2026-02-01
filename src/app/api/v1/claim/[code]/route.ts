@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 
 export async function POST(request: NextRequest, { params }: { params: { code: string } }) {
-  const db = getDb();
+  const client = await getDb();
   const body = await request.json();
   const { email, twitter } = body;
 
@@ -10,7 +10,8 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
     return NextResponse.json({ error: 'Provide email or twitter handle' }, { status: 400 });
   }
 
-  const agent = db.prepare('SELECT * FROM agents WHERE claim_code = ?').get(params.code) as Record<string, unknown> | undefined;
+  const agentResult = await client.execute({ sql: 'SELECT * FROM agents WHERE claim_code = ?', args: [params.code] });
+  const agent = agentResult.rows[0] as unknown as Record<string, unknown> | undefined;
   if (!agent) {
     return NextResponse.json({ error: 'Invalid claim code' }, { status: 404 });
   }
@@ -19,9 +20,10 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
     return NextResponse.json({ error: 'Agent already claimed' }, { status: 409 });
   }
 
-  db.prepare(`
-    UPDATE agents SET is_claimed = 1, owner_email = ?, owner_twitter = ? WHERE claim_code = ?
-  `).run(email || null, twitter || null, params.code);
+  await client.execute({
+    sql: `UPDATE agents SET is_claimed = 1, owner_email = ?, owner_twitter = ? WHERE claim_code = ?`,
+    args: [email || null, twitter || null, params.code],
+  });
 
   return NextResponse.json({
     message: 'Agent claimed successfully',

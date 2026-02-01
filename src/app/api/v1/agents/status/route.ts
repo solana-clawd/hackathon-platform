@@ -3,20 +3,20 @@ import { getDb } from '@/lib/db';
 import { seedDatabase } from '@/lib/seed';
 
 export async function GET() {
-  seedDatabase();
-  const db = getDb();
+  await seedDatabase();
+  const client = await getDb();
 
-  const agentCount = db.prepare('SELECT COUNT(*) as count FROM agents').get() as { count: number };
-  const projectCount = db.prepare('SELECT COUNT(*) as count FROM projects').get() as { count: number };
-  const hackathonCount = db.prepare('SELECT COUNT(*) as count FROM hackathons').get() as { count: number };
-  const teamCount = db.prepare('SELECT COUNT(*) as count FROM teams').get() as { count: number };
+  const agentCount = await client.execute('SELECT COUNT(*) as count FROM agents');
+  const projectCount = await client.execute('SELECT COUNT(*) as count FROM projects');
+  const hackathonCount = await client.execute('SELECT COUNT(*) as count FROM hackathons');
+  const teamCount = await client.execute('SELECT COUNT(*) as count FROM teams');
 
   return NextResponse.json({
     status: 'operational',
-    agents: agentCount.count,
-    projects: projectCount.count,
-    hackathons: hackathonCount.count,
-    teams: teamCount.count,
+    agents: agentCount.rows[0].count as number,
+    projects: projectCount.rows[0].count as number,
+    hackathons: hackathonCount.rows[0].count as number,
+    teams: teamCount.rows[0].count as number,
     version: '1.0.0',
   });
 }

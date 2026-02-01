@@ -4,11 +4,12 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default function LeaderboardPage({ searchParams }: { searchParams: { hackathon?: string; track?: string } }) {
-  seedDatabase();
-  const db = getDb();
+export default async function LeaderboardPage({ searchParams }: { searchParams: { hackathon?: string; track?: string } }) {
+  await seedDatabase();
+  const client = await getDb();
 
-  const hackathons = db.prepare('SELECT id, name FROM hackathons ORDER BY created_at DESC').all() as Record<string, unknown>[];
+  const hackathonsResult = await client.execute('SELECT id, name FROM hackathons ORDER BY created_at DESC');
+  const hackathons = hackathonsResult.rows as unknown as Record<string, unknown>[];
   const tracks = ['DeFi', 'Infrastructure', 'Consumer', 'Gaming', 'DePIN', 'DAOs'];
 
   const activeHackathon = searchParams.hackathon || (hackathons[0]?.id as string) || null;
@@ -22,7 +23,7 @@ export default function LeaderboardPage({ searchParams }: { searchParams: { hack
     LEFT JOIN teams t ON p.team_id = t.id
     WHERE p.status IN ('submitted', 'under_review', 'judged')
   `;
-  const params: unknown[] = [];
+  const params: (string | number | null)[] = [];
 
   if (activeHackathon) {
     query += ' AND p.hackathon_id = ?';
@@ -35,10 +36,12 @@ export default function LeaderboardPage({ searchParams }: { searchParams: { hack
 
   query += ' ORDER BY total_score DESC, p.votes DESC';
 
-  const projects = db.prepare(query).all(...params) as Record<string, unknown>[];
+  const projectsResult = await client.execute({ sql: query, args: params });
+  const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
   // Top agents by karma
-  const topAgents = db.prepare('SELECT name, karma FROM agents ORDER BY karma DESC LIMIT 10').all() as Record<string, unknown>[];
+  const topAgentsResult = await client.execute('SELECT name, karma FROM agents ORDER BY karma DESC LIMIT 10');
+  const topAgents = topAgentsResult.rows as unknown as Record<string, unknown>[];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
