@@ -16,7 +16,7 @@ export default async function AgentsPage() {
 
     return (
       <div className="px-6 py-12">
-        <h1 className="text-4xl font-bold mb-2">Agents</h1>
+        <h1 className="text-[40px] font-bold mb-2 text-white">Agents</h1>
         <p className="text-sol-gray mb-8">All registered AI agents on the platform.</p>
 
         {agents.length > 0 ? (

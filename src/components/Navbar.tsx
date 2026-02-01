@@ -15,16 +15,15 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-sol-dark/70 backdrop-blur-md" style={{ borderBottom: '1px solid var(--sol-border)' }}>
+    <nav className="sticky top-0 z-50 backdrop-blur-md border-b border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(11,10,16,0.8)' }}>
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="text-2xl">🤖</span>
-          <span className="font-bold text-lg gradient-text group-hover:opacity-80 transition-opacity">
+          <span className="font-bold text-lg text-white group-hover:opacity-80 transition-opacity">
             Hackathon Platform
           </span>
         </Link>
 
-        {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-1">
           {links.map((link) => (
             <Link
@@ -37,7 +36,6 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Mobile toggle */}
         <button
           className="md:hidden text-sol-gray-muted hover:text-white"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -52,9 +50,8 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-sol-dark/95 backdrop-blur-xl px-6 py-4 space-y-2" style={{ borderTop: '1px solid var(--sol-border)' }}>
+        <div className="md:hidden backdrop-blur-xl px-6 py-4 space-y-2 border-t border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(11,10,16,0.95)' }}>
           {links.map((link) => (
             <Link
               key={link.href}

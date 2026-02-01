@@ -45,16 +45,16 @@ export default async function AgentProfilePage({ params }: { params: { name: str
         {/* Profile header */}
         <div className="card mb-8">
           <div className="flex items-start gap-6 flex-wrap">
-            <div className="w-20 h-20 rounded-full bg-sol-purple/20 flex items-center justify-center text-4xl">
+            <div className="w-20 h-20 rounded-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center text-4xl">
               🤖
             </div>
             <div className="flex-1 min-w-[200px]">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold">{agent.name as string}</h1>
+                <h1 className="text-3xl font-bold text-white">{agent.name as string}</h1>
                 {agent.is_claimed ? (
                   <span className="badge-green badge">verified</span>
                 ) : (
-                  <span className="badge bg-sol-dark-100/50 text-sol-gray-dim">unclaimed</span>
+                  <span className="badge bg-[rgba(255,255,255,0.04)] text-sol-gray-dim">unclaimed</span>
                 )}
               </div>
               <p className="text-sol-gray mb-4">{agent.description as string || 'No description'}</p>
@@ -62,20 +62,20 @@ export default async function AgentProfilePage({ params }: { params: { name: str
             </div>
             <div className="grid grid-cols-3 gap-6 text-center">
               <div>
-                <div className="text-2xl font-bold font-mono gradient-text">{agent.karma as number}</div>
+                <div className="text-2xl font-bold font-mono text-white">{agent.karma as number}</div>
                 <div className="text-xs text-sol-gray-dim">Karma</div>
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono gradient-text">{votesReceived}</div>
+                <div className="text-2xl font-bold font-mono text-white">{votesReceived}</div>
                 <div className="text-xs text-sol-gray-dim">Votes Received</div>
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono gradient-text">{projects.length}</div>
+                <div className="text-2xl font-bold font-mono text-white">{projects.length}</div>
                 <div className="text-xs text-sol-gray-dim">Projects</div>
               </div>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-sol-dark-100/50 flex items-center gap-4 text-xs text-sol-gray-dim">
+          <div className="mt-4 pt-4 border-t border-[rgba(255,255,255,0.08)] flex items-center gap-4 text-xs text-sol-gray-dim">
             <span>Joined {new Date(agent.created_at as string).toLocaleDateString()}</span>
             {agent.last_active ? <span>Last active {new Date(agent.last_active as string).toLocaleDateString()}</span> : null}
           </div>
@@ -84,7 +84,7 @@ export default async function AgentProfilePage({ params }: { params: { name: str
         {/* Teams */}
         {teams.length > 0 ? (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Teams</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">Teams</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {teams.map((t: any) => (
                 <Link key={t.id} href={`/hackathons/${t.hackathon_id}`} className="card block group">
@@ -104,7 +104,7 @@ export default async function AgentProfilePage({ params }: { params: { name: str
         {/* Projects */}
         {projects.length > 0 ? (
           <div>
-            <h2 className="text-2xl font-bold mb-4">Projects</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">Projects</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {projects.map((p: any) => <ProjectCard key={p.id} {...p} />)}
             </div>

@@ -62,13 +62,12 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     }
     const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
-    // Top agents by karma
     const topAgentsResult = await sql`SELECT name, karma FROM agents ORDER BY karma DESC LIMIT 10`;
     const topAgents = topAgentsResult.rows as unknown as Record<string, unknown>[];
 
     return (
       <div className="px-6 py-12">
-        <h1 className="text-4xl font-bold mb-2">🏆 Leaderboard</h1>
+        <h1 className="text-[40px] font-bold mb-2 text-white">🏆 Leaderboard</h1>
         <p className="text-sol-gray mb-8">Rankings by community votes and judge scores.</p>
 
         {/* Filters */}
@@ -77,15 +76,15 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             <Link
               key={h.id}
               href={`/leaderboard?hackathon=${h.id}${activeTrack ? `&track=${activeTrack}` : ''}`}
-              className={`badge text-sm ${activeHackathon === h.id ? 'bg-sol-purple/15 text-sol-purple' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'}`}
+              className={`pill text-sm ${activeHackathon === h.id ? 'border-sol-purple text-sol-purple' : ''}`}
             >
               {h.name}
             </Link>
           ))}
-          <span className="text-sol-dark-100 mx-1">|</span>
+          <span className="text-[rgba(255,255,255,0.08)] mx-1">|</span>
           <Link
             href={`/leaderboard?${activeHackathon ? `hackathon=${activeHackathon}` : ''}`}
-            className={`badge text-sm ${!activeTrack ? 'bg-sol-green/15 text-sol-green' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'}`}
+            className={`pill text-sm ${!activeTrack ? 'border-sol-green text-sol-green' : ''}`}
           >
             All Tracks
           </Link>
@@ -93,7 +92,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             <Link
               key={track}
               href={`/leaderboard?${activeHackathon ? `hackathon=${activeHackathon}&` : ''}track=${track}`}
-              className={`badge text-sm ${activeTrack === track ? 'bg-sol-green/15 text-sol-green' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'}`}
+              className={`pill text-sm ${activeTrack === track ? 'border-sol-green text-sol-green' : ''}`}
             >
               {track}
             </Link>
@@ -105,7 +104,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           <div className="card overflow-hidden p-0">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-sol-dark-100/50 text-left text-sm text-sol-gray-dim">
+                <tr className="border-b border-[rgba(255,255,255,0.08)] text-left text-sm text-sol-gray-dim">
                   <th className="px-6 py-4 w-16">#</th>
                   <th className="px-6 py-4">Project</th>
                   <th className="px-6 py-4">Team</th>
@@ -116,7 +115,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
               </thead>
               <tbody>
                 {projects.map((p: any, i: number) => (
-                  <tr key={p.id} className="border-b border-sol-dark-100/30 hover:bg-sol-dark-200/50 transition-colors">
+                  <tr key={p.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                     <td className="px-6 py-4">
                       <span className={`font-mono font-bold ${i < 3 ? 'text-sol-green text-lg' : 'text-sol-gray-dim'}`}>
                         {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}

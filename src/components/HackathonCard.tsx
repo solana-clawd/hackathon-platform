@@ -15,7 +15,7 @@ const statusStyles: Record<string, string> = {
   upcoming: 'badge-yellow',
   active: 'badge-green',
   judging: 'badge-purple',
-  completed: 'bg-sol-dark-100/50 text-sol-gray-dim',
+  completed: 'bg-[rgba(255,255,255,0.04)] text-sol-gray-dim',
 };
 
 export default function HackathonCard({ id, name, description, start_date, end_date, status, tracks, prizes }: HackathonCardProps) {

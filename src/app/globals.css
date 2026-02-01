@@ -5,21 +5,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  --sol-purple: #9945FF;
-  --sol-green: #14F195;
-  --sol-green-bright: #00FFBD;
-  --sol-pink: #D884F0;
-  --sol-teal: #80ECFF;
-  --sol-dark: #0B0A10;
-  --sol-dark-100: #232323;
-  --sol-dark-300: #151118;
-  --sol-dark-400: #121212;
-  --sol-border: #1a1a1a;
-  --sol-border-hover: #333;
+  --border-low: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-strong: rgba(255, 255, 255, 0.25);
+  --bg: #0B0A10;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9D9DAE;
+  --text-muted: #848895;
+  --accent: #9945FF;
+  --accent-green: #14F195;
 }
 
 body {
-  background-color: #0B0A10;
+  background-color: var(--bg);
   color: #f9f9fb;
   font-family: 'Inter', system-ui, sans-serif;
 }
@@ -28,237 +26,144 @@ code, .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* ── launch.solana.com: Column Border Layout ── */
+/* Column border layout */
 .col-bordered {
   @apply max-w-7xl mx-auto;
-  border-left: 1px solid var(--sol-border);
-  border-right: 1px solid var(--sol-border);
+  border-left: 1px solid var(--border-low);
+  border-right: 1px solid var(--border-low);
 }
 
-/* ── launch.solana.com: Horizontal Section Divider ── */
+/* Section divider — simple line */
 .section-line {
-  position: relative;
-}
-.section-line::before {
-  content: '';
-  position: absolute;
-  left: -50vw;
-  right: -50vw;
-  top: 0;
   height: 1px;
-  background: var(--sol-border);
-  z-index: 1;
-}
-
-/* ── Animated pulse on section lines (like launch.solana.com) ── */
-@keyframes linePulse {
-  0% { left: -10%; opacity: 0; }
-  10% { opacity: 0.8; }
-  90% { opacity: 0.8; }
-  100% { left: 110%; opacity: 0; }
-}
-.section-line::after {
-  content: '';
-  position: absolute;
-  top: -0.5px;
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--sol-purple), transparent);
-  animation: linePulse 6s ease-in-out infinite;
-  z-index: 2;
+  background: var(--border-low);
 }
 
 @layer components {
-  /* ── Card: glass + dark, adapted from launch.solana.com ── */
+  /* Card — flat, ring-defined, no gradient */
   .card {
-    @apply rounded-[20px] p-6 transition-all duration-300 ease-in-out;
-    background: rgba(21, 17, 24, 0.8);
-    border: 1px solid rgba(153, 69, 255, 0.08);
-    backdrop-filter: blur(12px);
+    @apply p-6 transition-all duration-300 ease-in-out;
+    background: var(--bg);
+    border: none;
+    box-shadow: 0 0 0 1px var(--border-low);
   }
   .card:hover {
-    border-color: rgba(153, 69, 255, 0.2);
-    box-shadow: 0 0 30px rgba(153, 69, 255, 0.06);
+    box-shadow: 0 0 0 1px var(--border-medium);
   }
 
-  /* ── Card with hover scale (launch.solana.com product card pattern) ── */
+  /* Interactive card */
   .card-interactive {
     @apply card cursor-pointer;
-    transform: scale(1);
   }
   .card-interactive:hover {
-    transform: scale(1.02);
+    box-shadow: 0 0 0 1px var(--border-medium);
   }
   .card-interactive:active {
     transform: scale(0.98);
   }
 
-  /* ── Card with gradient border ── */
-  .card-gradient {
-    @apply card relative overflow-hidden;
-  }
-  .card-gradient::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(153, 69, 255, 0.3), rgba(20, 241, 149, 0.1));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-
-  /* ── Icon container (launch.solana.com: bg-highlight rounded-[20px]) ── */
+  /* Icon container */
   .icon-box {
     @apply flex items-center justify-center rounded-[20px] p-4 transition-all duration-300 ease-in-out;
-    background: rgba(153, 69, 255, 0.1);
-    border: 1px solid rgba(153, 69, 255, 0.2);
-    box-shadow: inset 0 -1px 1px rgba(153, 69, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.2);
-  }
-  .icon-box:hover {
-    background: rgba(153, 69, 255, 0.15);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-low);
   }
 
-  /* ── Buttons ── */
+  /* Primary button — pill, border only, accent on hover */
   .btn-primary {
-    @apply text-white font-semibold px-6 py-3 rounded-full transition-all duration-200;
-    background: linear-gradient(135deg, #9945FF, #7B47FF);
+    @apply font-semibold px-6 py-3 rounded-full transition-all duration-200 bg-transparent text-white;
+    border: 1px solid var(--border-strong);
   }
   .btn-primary:hover {
-    background: linear-gradient(135deg, #a855f7, #8b5cf6);
-    box-shadow: 0 0 24px rgba(153, 69, 255, 0.3);
+    border-color: var(--accent);
+    color: var(--accent);
   }
   .btn-primary:active {
     transform: scale(0.98);
   }
 
-  /* launch.solana.com pill button style → dark mode */
+  /* Secondary button — pill, subtle border */
   .btn-secondary {
     @apply font-medium px-5 py-2.5 rounded-full transition-all duration-200 bg-transparent;
-    border: 1px solid rgba(153, 69, 255, 0.3);
-    color: #ABABBC;
+    border: 1px solid var(--border-low);
+    color: var(--text-secondary);
   }
   .btn-secondary:hover {
-    border-color: #9945FF;
+    border-color: var(--border-strong);
     color: #fff;
   }
   .btn-secondary:active {
     transform: scale(0.98);
   }
 
+  /* Green button — solid, minimal */
   .btn-green {
-    @apply bg-sol-green text-sol-dark font-semibold px-6 py-3 rounded-full transition-all duration-200;
+    @apply font-semibold px-6 py-3 rounded-full transition-all duration-200 bg-transparent text-[#14F195];
+    border: 1px solid rgba(20, 241, 149, 0.3);
   }
   .btn-green:hover {
-    background-color: #00FFBD;
-    box-shadow: 0 0 24px rgba(20, 241, 149, 0.3);
+    border-color: #14F195;
   }
   .btn-green:active {
     transform: scale(0.98);
   }
 
-  /* launch.solana.com: small pill link buttons */
+  /* Pill — small link button */
   .pill {
     @apply font-medium px-3 py-1 bg-transparent text-sm rounded-full transition-all duration-200;
-    border: 1px solid var(--sol-border);
-    color: #9D9DAE;
+    border: 1px solid var(--border-low);
+    color: var(--text-secondary);
   }
   .pill:hover {
-    border-color: var(--sol-border-hover);
+    border-color: var(--border-medium);
     color: #fff;
   }
   .pill:active {
     transform: scale(0.98);
   }
 
-  /* ── Badges ── */
+  /* Badges */
   .badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
   }
-
   .badge-purple {
     @apply badge;
-    background: rgba(153, 69, 255, 0.15);
-    color: #D884F0;
+    background: rgba(153, 69, 255, 0.1);
+    color: #c4a0ff;
   }
-
   .badge-green {
     @apply badge;
-    background: rgba(20, 241, 149, 0.15);
+    background: rgba(20, 241, 149, 0.1);
     color: #14F195;
   }
-
   .badge-yellow {
-    @apply badge bg-yellow-500/15 text-yellow-400;
+    @apply badge bg-yellow-500/10 text-yellow-400;
   }
-
   .badge-blue {
     @apply badge;
-    background: rgba(100, 168, 242, 0.15);
+    background: rgba(100, 168, 242, 0.1);
     color: #80ECFF;
   }
 
-  /* ── Input ── */
+  /* Input */
   .input {
     @apply rounded-full px-5 py-3 text-white focus:outline-none transition-all duration-200;
-    background: rgba(11, 10, 16, 0.8);
-    border: 1px solid var(--sol-border);
+    background: var(--bg);
+    border: 1px solid var(--border-low);
   }
   .input::placeholder {
-    color: #848895;
+    color: var(--text-muted);
   }
   .input:focus {
-    border-color: rgba(153, 69, 255, 0.4);
-    box-shadow: 0 0 16px rgba(153, 69, 255, 0.1);
-  }
-
-  /* ── Gradient text ── */
-  .gradient-text {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(to right, #9945FF, #14F195);
+    border-color: var(--border-strong);
   }
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #0B0A10;
-}
-::-webkit-scrollbar-thumb {
-  background: #232323;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #9945FF;
-}
-
-/* ── Animations ── */
+/* Animations — keep minimal */
 @keyframes countUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-count {
   animation: countUp 0.5s ease-out forwards;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* ── Dashed crosshair pattern (launch.solana.com card decoration) ── */
-.crosshair-bg {
-  background-image:
-    linear-gradient(0deg, rgba(153, 69, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(153, 69, 255, 0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
 }

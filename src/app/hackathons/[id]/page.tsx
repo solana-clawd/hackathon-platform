@@ -33,7 +33,7 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
       upcoming: 'badge-yellow',
       active: 'badge-green',
       judging: 'badge-purple',
-      completed: 'bg-sol-dark-100/50 text-sol-gray-dim',
+      completed: 'bg-[rgba(255,255,255,0.04)] text-sol-gray-dim',
     };
 
     const formatDate = (d: string | null) => d ? new Date(d as string).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
@@ -42,10 +42,10 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
       <div className="px-6 py-12">
         {/* Header */}
         <div className="mb-12">
-          <Link href="/hackathons" className="text-sol-gray-dim hover:text-sol-gray-light text-sm mb-4 inline-block">← Back to Hackathons</Link>
+          <Link href="/hackathons" className="text-sol-gray-dim hover:text-white text-sm mb-4 inline-block transition-colors">← Back to Hackathons</Link>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2">{hackathon.name as string}</h1>
+              <h1 className="text-[40px] font-bold mb-2 text-white">{hackathon.name as string}</h1>
               <p className="text-sol-gray max-w-2xl">{hackathon.description as string}</p>
             </div>
             <span className={`badge uppercase tracking-wide ${statusColors[hackathon.status as string] || 'badge-purple'}`}>
@@ -58,13 +58,13 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="card">
             <h3 className="text-sm text-sol-gray-dim mb-2">Timeline</h3>
-            <p className="font-mono text-sm">
+            <p className="font-mono text-sm text-white">
               {formatDate(hackathon.start_date as string)} — {formatDate(hackathon.end_date as string)}
             </p>
           </div>
           <div className="card">
             <h3 className="text-sm text-sol-gray-dim mb-2">Participants</h3>
-            <p className="font-mono text-2xl font-bold gradient-text">{teamCount} teams</p>
+            <p className="font-mono text-2xl font-bold text-white">{teamCount} teams</p>
             <p className="text-sm text-sol-gray-dim">{projects.length} projects submitted</p>
           </div>
           <div className="card">
@@ -77,11 +77,11 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
 
         {/* Tracks */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Tracks</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">Tracks</h2>
           <div className="grid md:grid-cols-3 gap-4">
             {tracks.map((track: string) => (
               <div key={track} className="card flex items-center justify-between">
-                <span className="font-semibold">{track}</span>
+                <span className="font-semibold text-white">{track}</span>
                 {prizes[track] ? <span className="font-mono text-sol-green text-sm">{prizes[track]}</span> : null}
               </div>
             ))}
@@ -91,12 +91,12 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
         {/* Prizes */}
         {Object.keys(prizes).length > 0 ? (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-4">Prizes</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">Prizes</h2>
             <div className="card">
               <div className="space-y-3">
                 {Object.entries(prizes).map(([name, amount]) => (
-                  <div key={name} className="flex items-center justify-between py-2 border-b border-sol-dark-100/50 last:border-0">
-                    <span className="font-medium">{name}</span>
+                  <div key={name} className="flex items-center justify-between py-2 border-b border-[rgba(255,255,255,0.08)] last:border-0">
+                    <span className="font-medium text-white">{name}</span>
                     <span className="font-mono text-sol-green font-bold">{amount as string}</span>
                   </div>
                 ))}
@@ -108,8 +108,8 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
         {/* Projects */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Projects ({projects.length})</h2>
-            <Link href={`/leaderboard?hackathon=${params.id}`} className="text-sol-purple hover:underline text-sm">
+            <h2 className="text-2xl font-bold text-white">Projects ({projects.length})</h2>
+            <Link href={`/leaderboard?hackathon=${params.id}`} className="pill">
               View Leaderboard →
             </Link>
           </div>

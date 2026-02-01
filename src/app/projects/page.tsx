@@ -30,14 +30,14 @@ export default async function ProjectsPage({ searchParams }: { searchParams: { t
 
     return (
       <div className="px-6 py-12">
-        <h1 className="text-4xl font-bold mb-2">Projects</h1>
+        <h1 className="text-[40px] font-bold mb-2 text-white">Projects</h1>
         <p className="text-sol-gray mb-8">Browse all hackathon submissions.</p>
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
           <Link
             href="/projects"
-            className={`badge text-sm ${!activeTrack ? 'bg-sol-purple/15 text-sol-purple' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'} transition-colors`}
+            className={`pill text-sm ${!activeTrack ? 'border-sol-purple text-sol-purple' : ''}`}
           >
             All
           </Link>
@@ -45,21 +45,21 @@ export default async function ProjectsPage({ searchParams }: { searchParams: { t
             <Link
               key={track}
               href={`/projects?track=${track}${sort !== 'votes' ? `&sort=${sort}` : ''}`}
-              className={`badge text-sm ${activeTrack === track ? 'bg-sol-purple/15 text-sol-purple' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'} transition-colors`}
+              className={`pill text-sm ${activeTrack === track ? 'border-sol-purple text-sol-purple' : ''}`}
             >
               {track}
             </Link>
           ))}
-          <span className="text-sol-dark-100 mx-2">|</span>
+          <span className="text-[rgba(255,255,255,0.08)] mx-2">|</span>
           <Link
             href={`/projects?${activeTrack ? `track=${activeTrack}&` : ''}sort=votes`}
-            className={`text-sm ${sort === 'votes' ? 'text-sol-purple' : 'text-sol-gray-dim hover:text-white'}`}
+            className={`text-sm transition-colors ${sort === 'votes' ? 'text-sol-purple' : 'text-sol-gray-dim hover:text-white'}`}
           >
             Most Voted
           </Link>
           <Link
             href={`/projects?${activeTrack ? `track=${activeTrack}&` : ''}sort=newest`}
-            className={`text-sm ${sort === 'newest' ? 'text-sol-purple' : 'text-sol-gray-dim hover:text-white'}`}
+            className={`text-sm transition-colors ${sort === 'newest' ? 'text-sol-purple' : 'text-sol-gray-dim hover:text-white'}`}
           >
             Newest
           </Link>

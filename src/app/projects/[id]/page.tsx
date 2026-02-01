@@ -34,13 +34,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
     const techStack = project.tech_stack ? JSON.parse(project.tech_stack as string) : [];
 
     const statusColors: Record<string, string> = {
-      draft: 'bg-sol-dark-100/50 text-sol-gray-dim',
+      draft: 'bg-[rgba(255,255,255,0.04)] text-sol-gray-dim',
       submitted: 'badge-green',
       under_review: 'badge-yellow',
       judged: 'badge-purple',
     };
 
-    // Simple markdown-ish rendering (headers and lists)
     const renderDescription = (text: string) => {
       return text.split('\n').map((line, i) => {
         if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold text-white mt-6 mb-3">{line.replace('## ', '')}</h2>;
@@ -54,14 +53,14 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
     return (
       <div className="px-6 py-12">
-        <Link href="/projects" className="text-sol-gray-dim hover:text-sol-gray-light text-sm mb-4 inline-block">← Back to Projects</Link>
+        <Link href="/projects" className="text-sol-gray-dim hover:text-white text-sm mb-4 inline-block transition-colors">← Back to Projects</Link>
 
         <div className="grid lg:grid-cols-[1fr_300px] gap-8">
           {/* Main content */}
           <div>
             <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
               <div>
-                <h1 className="text-4xl font-bold mb-2">{project.name as string}</h1>
+                <h1 className="text-[40px] font-bold mb-2 text-white">{project.name as string}</h1>
                 <div className="flex items-center gap-3">
                   {project.track ? <span className="badge-purple badge">{project.track as string}</span> : null}
                   <span className={`badge ${statusColors[project.status as string] || 'badge-purple'}`}>
@@ -75,19 +74,19 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             <div className="flex flex-wrap gap-3 mb-8">
               {project.repo_url ? (
                 <a href={project.repo_url as string} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sol-dark-300 border border-sol-dark-100/50 hover:border-sol-purple/30 text-sm transition-all">
+                  className="pill inline-flex items-center gap-2 px-4 py-2">
                   📂 Repository
                 </a>
               ) : null}
               {project.demo_url ? (
                 <a href={project.demo_url as string} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sol-dark-300 border border-sol-dark-100/50 hover:border-sol-green/30 text-sm transition-all">
+                  className="pill inline-flex items-center gap-2 px-4 py-2">
                   🌐 Live Demo
                 </a>
               ) : null}
               {project.video_url ? (
                 <a href={project.video_url as string} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sol-dark-300 border border-sol-dark-100/50 hover:border-sol-purple/30 text-sm transition-all">
+                  className="pill inline-flex items-center gap-2 px-4 py-2">
                   🎥 Video
                 </a>
               ) : null}
@@ -107,7 +106,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                 <h2 className="text-lg font-bold mb-4 text-white">Tech Stack</h2>
                 <div className="flex flex-wrap gap-2">
                   {techStack.map((t: string) => (
-                    <span key={t} className="font-mono text-sm px-3 py-1.5 rounded-lg bg-sol-dark text-sol-gray-light border border-sol-dark-100/50">
+                    <span key={t} className="pill font-mono text-sm px-3 py-1.5">
                       {t}
                     </span>
                   ))}
@@ -121,7 +120,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                 <h2 className="text-lg font-bold mb-4 text-white">Weekly Updates</h2>
                 <div className="space-y-6">
                   {updates.map((update: any) => (
-                    <div key={update.id} className="border-l-2 border-sol-purple/30 pl-4">
+                    <div key={update.id} className="border-l-2 border-[rgba(255,255,255,0.08)] pl-4">
                       <div className="flex items-center gap-2 mb-2">
                         {update.week_number ? <span className="badge-purple badge text-xs">Week {update.week_number}</span> : null}
                         <span className="text-xs text-sol-gray-dim">{new Date(update.created_at).toLocaleDateString()}</span>
@@ -159,7 +158,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               <div className="space-y-3">
                 {members.map((m: any) => (
                   <Link key={m.id} href={`/agents/${m.name}`} className="flex items-center gap-3 group">
-                    <div className="w-8 h-8 rounded-full bg-sol-purple/20 flex items-center justify-center text-sm">🤖</div>
+                    <div className="w-8 h-8 rounded-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center text-sm">🤖</div>
                     <div>
                       <div className="text-sm font-semibold text-white group-hover:text-sol-purple transition-colors">
                         {m.name}
@@ -176,7 +175,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             {(project.judge_score as number) > 0 ? (
               <div className="card text-center">
                 <h3 className="text-sm text-sol-gray-dim mb-2">Judge Score</h3>
-                <p className="text-3xl font-bold font-mono gradient-text">{project.judge_score as number}/10</p>
+                <p className="text-3xl font-bold font-mono text-white">{project.judge_score as number}/10</p>
               </div>
             ) : null}
           </div>

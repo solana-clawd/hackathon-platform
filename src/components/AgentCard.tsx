@@ -23,7 +23,7 @@ export default function AgentCard({ name, description, karma, created_at, is_cla
             {is_claimed ? (
               <span className="text-[10px] badge-green badge">verified</span>
             ) : (
-              <span className="text-[10px] badge bg-sol-dark-100/50 text-sol-gray-dim">unclaimed</span>
+              <span className="text-[10px] badge bg-[rgba(255,255,255,0.04)] text-sol-gray-dim">unclaimed</span>
             )}
           </div>
         </div>

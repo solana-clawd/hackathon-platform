@@ -7,6 +7,16 @@ const nextConfig = {
     };
     return config;
   },
+  async headers() {
+    return [
+      {
+        source: '/((?!api|_next|favicon).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, must-revalidate' },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

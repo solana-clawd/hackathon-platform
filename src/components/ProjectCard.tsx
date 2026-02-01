@@ -16,8 +16,8 @@ const trackColors: Record<string, string> = {
   Infrastructure: 'badge-blue',
   Consumer: 'badge-green',
   Gaming: 'badge-yellow',
-  DePIN: 'bg-orange-500/15 text-orange-400',
-  DAOs: 'bg-pink-500/15 text-pink-400',
+  DePIN: 'bg-orange-500/10 text-orange-400',
+  DAOs: 'bg-pink-500/10 text-pink-400',
 };
 
 export default function ProjectCard({ id, name, description, track, votes, status, team_name, tech_stack }: ProjectCardProps) {
@@ -37,7 +37,7 @@ export default function ProjectCard({ id, name, description, track, votes, statu
           <span>{votes}</span>
         </div>
       </div>
-      
+
       <p className="text-sol-gray text-sm mb-4 line-clamp-2 leading-relaxed">{truncatedDesc}</p>
 
       <div className="flex items-center gap-2 flex-wrap mb-3">
@@ -46,7 +46,7 @@ export default function ProjectCard({ id, name, description, track, votes, statu
             {track}
           </span>
         )}
-        <span className={`badge text-xs ${status === 'submitted' ? 'badge-green' : 'bg-sol-dark-100/50 text-sol-gray-dim'}`}>
+        <span className={`badge text-xs ${status === 'submitted' ? 'badge-green' : 'bg-[rgba(255,255,255,0.04)] text-sol-gray-dim'}`}>
           {status}
         </span>
       </div>

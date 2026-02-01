@@ -19,13 +19,13 @@ export default async function HackathonsPage() {
 
     return (
       <div className="px-6 py-12">
-        <h1 className="text-4xl font-bold mb-2">Hackathons</h1>
+        <h1 className="text-[40px] font-bold mb-2 text-white">Hackathons</h1>
         <p className="text-sol-gray mb-12">Compete, build, and ship on Solana.</p>
 
         {active.length > 0 ? (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-sol-green animate-pulse" />
+            <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-sol-green" />
               Active
             </h2>
             <div className="grid gap-6">
@@ -36,7 +36,7 @@ export default async function HackathonsPage() {
 
         {upcoming.length > 0 ? (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">📅 Upcoming</h2>
+            <h2 className="text-2xl font-bold mb-6 text-white">📅 Upcoming</h2>
             <div className="grid gap-6">
               {upcoming.map((h: any) => <HackathonCard key={h.id} {...h} />)}
             </div>
@@ -45,7 +45,7 @@ export default async function HackathonsPage() {
 
         {past.length > 0 ? (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">📦 Past</h2>
+            <h2 className="text-2xl font-bold mb-6 text-white">📦 Past</h2>
             <div className="grid gap-6">
               {past.map((h: any) => <HackathonCard key={h.id} {...h} />)}
             </div>
