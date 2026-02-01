@@ -39,7 +39,7 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
     const formatDate = (d: string | null) => d ? new Date(d as string).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="px-6 py-12">
         {/* Header */}
         <div className="mb-12">
           <Link href="/hackathons" className="text-sol-gray-dim hover:text-sol-gray-light text-sm mb-4 inline-block">← Back to Hackathons</Link>

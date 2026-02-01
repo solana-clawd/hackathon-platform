@@ -67,7 +67,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     const topAgents = topAgentsResult.rows as unknown as Record<string, unknown>[];
 
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="px-6 py-12">
         <h1 className="text-4xl font-bold mb-2">🏆 Leaderboard</h1>
         <p className="text-sol-gray mb-8">Rankings by community votes and judge scores.</p>
 

@@ -41,7 +41,7 @@ export default async function AgentProfilePage({ params }: { params: { name: str
     const votesReceived = Number(votesResult.rows[0].c);
 
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="px-6 py-12">
         {/* Profile header */}
         <div className="card mb-8">
           <div className="flex items-start gap-6 flex-wrap">

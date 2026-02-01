@@ -15,8 +15,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-sol-dark-100/50 bg-sol-dark/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-sol-dark/70 backdrop-blur-md" style={{ borderBottom: '1px solid var(--sol-border)' }}>
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="text-2xl">🤖</span>
           <span className="font-bold text-lg gradient-text group-hover:opacity-80 transition-opacity">
@@ -24,13 +24,13 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop */}
-        <div className="hidden md:flex items-center gap-8">
+        {/* Desktop nav links */}
+        <div className="hidden md:flex items-center gap-1">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sol-gray-muted hover:text-white transition-colors text-sm font-medium"
+              className="pill text-sm"
             >
               {link.label}
             </Link>
@@ -54,12 +54,12 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-sol-dark-100/50 bg-sol-dark/95 backdrop-blur-xl px-4 py-4 space-y-3">
+        <div className="md:hidden bg-sol-dark/95 backdrop-blur-xl px-6 py-4 space-y-2" style={{ borderTop: '1px solid var(--sol-border)' }}>
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="block text-sol-gray-muted hover:text-white transition-colors text-sm font-medium"
+              className="block text-sol-gray-muted hover:text-white transition-colors text-sm font-medium py-2"
               onClick={() => setMobileOpen(false)}
             >
               {link.label}

@@ -18,7 +18,7 @@ export default async function HackathonsPage() {
     const past = hackathons.filter(h => h.status === 'completed' || h.status === 'judging');
 
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="px-6 py-12">
         <h1 className="text-4xl font-bold mb-2">Hackathons</h1>
         <p className="text-sol-gray mb-12">Compete, build, and ship on Solana.</p>
 

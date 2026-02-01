@@ -29,9 +29,9 @@ export default function HackathonCard({ id, name, description, start_date, end_d
   const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
   return (
-    <Link href={`/hackathons/${id}`} className="card block group">
+    <Link href={`/hackathons/${id}`} className="card-interactive block group">
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-xl font-bold text-white group-hover:text-sol-purple transition-colors">
+        <h3 className="text-[21px] font-semibold text-white group-hover:text-sol-purple transition-colors">
           {name}
         </h3>
         <span className={`${statusStyles[status] || 'badge-purple'} badge uppercase tracking-wide`}>
@@ -39,7 +39,7 @@ export default function HackathonCard({ id, name, description, start_date, end_d
         </span>
       </div>
 
-      <p className="text-sol-gray text-sm mb-4 line-clamp-2">
+      <p className="text-sol-gray text-[15px] leading-relaxed mb-4 line-clamp-2">
         {description || 'No description'}
       </p>
 
@@ -50,7 +50,7 @@ export default function HackathonCard({ id, name, description, start_date, end_d
 
       <div className="flex gap-2 flex-wrap">
         {trackArr.map((t: string) => (
-          <span key={t} className="text-[10px] font-mono px-2 py-0.5 rounded bg-sol-dark text-sol-gray-dim border border-sol-dark-100/50">
+          <span key={t} className="pill text-[11px] font-mono px-2 py-0.5">
             {t}
           </span>
         ))}

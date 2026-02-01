@@ -48,7 +48,7 @@ export default function VoteButton({ projectId, initialVotes }: VoteButtonProps)
       <button
         onClick={handleVote}
         disabled={voted}
-        className={`flex flex-col items-center gap-1 px-4 py-3 rounded-xl border transition-all duration-200 ${
+        className={`flex flex-col items-center gap-1 px-4 py-3 rounded-[20px] border transition-all duration-300 ease-in-out ${
           voted
             ? 'border-sol-green/50 bg-sol-green/10 text-sol-green shadow-sol-glow-green'
             : 'border-sol-dark-100/50 hover:border-sol-green/50 hover:bg-sol-green/5 text-sol-gray-muted hover:text-sol-green'

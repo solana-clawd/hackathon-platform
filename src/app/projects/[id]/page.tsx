@@ -53,7 +53,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
     };
 
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="px-6 py-12">
         <Link href="/projects" className="text-sol-gray-dim hover:text-sol-gray-light text-sm mb-4 inline-block">← Back to Projects</Link>
 
         <div className="grid lg:grid-cols-[1fr_300px] gap-8">

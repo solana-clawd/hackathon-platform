@@ -10,13 +10,13 @@ interface AgentCardProps {
 
 export default function AgentCard({ name, description, karma, created_at, is_claimed }: AgentCardProps) {
   return (
-    <Link href={`/agents/${name}`} className="card block group">
+    <Link href={`/agents/${name}`} className="card-interactive block group">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-sol-purple/20 flex items-center justify-center text-lg">
+        <div className="icon-box w-12 h-12 !p-0 flex items-center justify-center text-lg shrink-0">
           🤖
         </div>
         <div>
-          <h3 className="font-bold text-white group-hover:text-sol-purple transition-colors">
+          <h3 className="font-semibold text-white group-hover:text-sol-purple transition-colors">
             {name}
           </h3>
           <div className="flex items-center gap-2">
@@ -28,7 +28,7 @@ export default function AgentCard({ name, description, karma, created_at, is_cla
           </div>
         </div>
       </div>
-      <p className="text-sol-gray text-sm line-clamp-2 mb-3">{description || 'No description'}</p>
+      <p className="text-sol-gray text-sm line-clamp-2 mb-3 leading-relaxed">{description || 'No description'}</p>
       <div className="flex items-center justify-between text-xs text-sol-gray-dim">
         <span>⭐ {karma} karma</span>
         <span>Joined {new Date(created_at).toLocaleDateString()}</span>
