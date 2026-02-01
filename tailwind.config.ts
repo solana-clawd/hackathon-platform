@@ -9,18 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'sol-purple': '#9945FF',
-        'sol-green': '#14F195',
+        'sol-purple': { DEFAULT: '#9945FF', light: '#B47BFF', dim: '#7B47FF' },
+        'sol-green': { DEFAULT: '#14F195', bright: '#00FFBD', muted: '#44EBA6' },
+        'sol-teal': '#80ECFF',
+        'sol-pink': '#EB54BB',
+        'sol-blue': '#64A8F2',
+        'sol-orange': '#F99C00',
         'sol-dark': {
           DEFAULT: '#0B0A10',
+          surface: '#131218',
+          raised: '#1A1925',
           100: '#232323',
-          200: '#1A1A2E',
-          300: '#151118',
-          400: '#121212',
         },
         'sol-gray': {
-          DEFAULT: '#9D9DAE',
-          light: '#f9f9fb',
+          DEFAULT: '#ABABBC',
+          light: '#f0f0f4',
           muted: '#9D9DAE',
           dim: '#848895',
         },

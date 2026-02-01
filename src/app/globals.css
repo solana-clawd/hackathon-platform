@@ -9,16 +9,21 @@
   --border-medium: rgba(255, 255, 255, 0.15);
   --border-strong: rgba(255, 255, 255, 0.25);
   --bg: #0B0A10;
+  --bg-surface: #131218;
+  --bg-raised: #1A1925;
   --text-primary: #FFFFFF;
-  --text-secondary: #9D9DAE;
+  --text-secondary: #ABABBC;
   --text-muted: #848895;
   --accent: #9945FF;
+  --accent-light: #B47BFF;
   --accent-green: #14F195;
+  --accent-teal: #80ECFF;
+  --accent-pink: #EB54BB;
 }
 
 body {
   background-color: var(--bg);
-  color: #f9f9fb;
+  color: #f0f0f4;
   font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -40,15 +45,15 @@ code, .font-mono {
 }
 
 @layer components {
-  /* Card — flat, ring-defined, no gradient */
+  /* Card — raised surface with subtle border */
   .card {
-    @apply p-6 transition-all duration-300 ease-in-out;
-    background: var(--bg);
-    border: none;
-    box-shadow: 0 0 0 1px var(--border-low);
+    @apply p-6 rounded-lg transition-all duration-300 ease-in-out;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-low);
   }
   .card:hover {
-    box-shadow: 0 0 0 1px var(--border-medium);
+    border-color: var(--border-medium);
+    background: var(--bg-raised);
   }
 
   /* Interactive card */
@@ -56,7 +61,8 @@ code, .font-mono {
     @apply card cursor-pointer;
   }
   .card-interactive:hover {
-    box-shadow: 0 0 0 1px var(--border-medium);
+    border-color: rgba(153, 69, 255, 0.2);
+    background: var(--bg-raised);
   }
   .card-interactive:active {
     transform: scale(0.98);
@@ -65,18 +71,19 @@ code, .font-mono {
   /* Icon container */
   .icon-box {
     @apply flex items-center justify-center rounded-[20px] p-4 transition-all duration-300 ease-in-out;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border-low);
+    background: rgba(153, 69, 255, 0.06);
+    border: 1px solid rgba(153, 69, 255, 0.15);
   }
 
-  /* Primary button — pill, border only, accent on hover */
+  /* Primary button — solid purple */
   .btn-primary {
-    @apply font-semibold px-6 py-3 rounded-full transition-all duration-200 bg-transparent text-white;
-    border: 1px solid var(--border-strong);
+    @apply font-semibold px-6 py-3 rounded-full transition-all duration-200 text-white;
+    background: var(--accent);
+    border: 1px solid var(--accent);
   }
   .btn-primary:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    background: var(--accent-light);
+    border-color: var(--accent-light);
   }
   .btn-primary:active {
     transform: scale(0.98);
@@ -85,24 +92,26 @@ code, .font-mono {
   /* Secondary button — pill, subtle border */
   .btn-secondary {
     @apply font-medium px-5 py-2.5 rounded-full transition-all duration-200 bg-transparent;
-    border: 1px solid var(--border-low);
+    border: 1px solid var(--border-medium);
     color: var(--text-secondary);
   }
   .btn-secondary:hover {
-    border-color: var(--border-strong);
+    border-color: var(--accent);
     color: #fff;
   }
   .btn-secondary:active {
     transform: scale(0.98);
   }
 
-  /* Green button — solid, minimal */
+  /* Green button — solid green */
   .btn-green {
-    @apply font-semibold px-6 py-3 rounded-full transition-all duration-200 bg-transparent text-[#14F195];
-    border: 1px solid rgba(20, 241, 149, 0.3);
+    @apply font-semibold px-6 py-3 rounded-full transition-all duration-200 text-[#0B0A10];
+    background: var(--accent-green);
+    border: 1px solid var(--accent-green);
   }
   .btn-green:hover {
-    border-color: #14F195;
+    background: #44EBA6;
+    border-color: #44EBA6;
   }
   .btn-green:active {
     transform: scale(0.98);
@@ -122,27 +131,34 @@ code, .font-mono {
     transform: scale(0.98);
   }
 
-  /* Badges */
+  /* Badges — distinct colored backgrounds */
   .badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
   }
   .badge-purple {
     @apply badge;
-    background: rgba(153, 69, 255, 0.1);
-    color: #c4a0ff;
+    background: rgba(153, 69, 255, 0.15);
+    color: #B47BFF;
   }
   .badge-green {
     @apply badge;
-    background: rgba(20, 241, 149, 0.1);
+    background: rgba(20, 241, 149, 0.12);
     color: #14F195;
   }
   .badge-yellow {
-    @apply badge bg-yellow-500/10 text-yellow-400;
+    @apply badge;
+    background: rgba(255, 174, 0, 0.12);
+    color: #FFD060;
   }
   .badge-blue {
     @apply badge;
-    background: rgba(100, 168, 242, 0.1);
+    background: rgba(128, 236, 255, 0.12);
     color: #80ECFF;
+  }
+  .badge-pink {
+    @apply badge;
+    background: rgba(235, 84, 187, 0.12);
+    color: #EB54BB;
   }
 
   /* Input */
