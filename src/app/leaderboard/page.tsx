@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import DatabaseError from '@/components/DatabaseError';
 import Link from 'next/link';
@@ -8,41 +9,61 @@ export const dynamic = 'force-dynamic';
 export default async function LeaderboardPage({ searchParams }: { searchParams: { hackathon?: string; track?: string } }) {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
-    const hackathonsResult = await client.execute('SELECT id, name FROM hackathons ORDER BY created_at DESC');
+    const hackathonsResult = await sql`SELECT id, name FROM hackathons ORDER BY created_at DESC`;
     const hackathons = hackathonsResult.rows as unknown as Record<string, unknown>[];
     const tracks = ['DeFi', 'Infrastructure', 'Consumer', 'Gaming', 'DePIN', 'DAOs'];
 
     const activeHackathon = searchParams.hackathon || (hackathons[0]?.id as string) || null;
     const activeTrack = searchParams.track || null;
 
-    let query = `
-      SELECT p.id, p.name, p.track, p.votes, p.judge_score, p.status,
-        t.name as team_name,
-        (p.votes + p.judge_score * 10) as total_score
-      FROM projects p
-      LEFT JOIN teams t ON p.team_id = t.id
-      WHERE p.status IN ('submitted', 'under_review', 'judged')
-    `;
-    const params: (string | number | null)[] = [];
-
-    if (activeHackathon) {
-      query += ' AND p.hackathon_id = ?';
-      params.push(activeHackathon);
+    let projectsResult;
+    if (activeHackathon && activeTrack) {
+      projectsResult = await sql`
+        SELECT p.id, p.name, p.track, p.votes, p.judge_score, p.status,
+          t.name as team_name,
+          (p.votes + p.judge_score * 10) as total_score
+        FROM projects p
+        LEFT JOIN teams t ON p.team_id = t.id
+        WHERE p.status IN ('submitted', 'under_review', 'judged')
+          AND p.hackathon_id = ${activeHackathon}
+          AND p.track = ${activeTrack}
+        ORDER BY total_score DESC, p.votes DESC`;
+    } else if (activeHackathon) {
+      projectsResult = await sql`
+        SELECT p.id, p.name, p.track, p.votes, p.judge_score, p.status,
+          t.name as team_name,
+          (p.votes + p.judge_score * 10) as total_score
+        FROM projects p
+        LEFT JOIN teams t ON p.team_id = t.id
+        WHERE p.status IN ('submitted', 'under_review', 'judged')
+          AND p.hackathon_id = ${activeHackathon}
+        ORDER BY total_score DESC, p.votes DESC`;
+    } else if (activeTrack) {
+      projectsResult = await sql`
+        SELECT p.id, p.name, p.track, p.votes, p.judge_score, p.status,
+          t.name as team_name,
+          (p.votes + p.judge_score * 10) as total_score
+        FROM projects p
+        LEFT JOIN teams t ON p.team_id = t.id
+        WHERE p.status IN ('submitted', 'under_review', 'judged')
+          AND p.track = ${activeTrack}
+        ORDER BY total_score DESC, p.votes DESC`;
+    } else {
+      projectsResult = await sql`
+        SELECT p.id, p.name, p.track, p.votes, p.judge_score, p.status,
+          t.name as team_name,
+          (p.votes + p.judge_score * 10) as total_score
+        FROM projects p
+        LEFT JOIN teams t ON p.team_id = t.id
+        WHERE p.status IN ('submitted', 'under_review', 'judged')
+        ORDER BY total_score DESC, p.votes DESC`;
     }
-    if (activeTrack) {
-      query += ' AND p.track = ?';
-      params.push(activeTrack);
-    }
-
-    query += ' ORDER BY total_score DESC, p.votes DESC';
-
-    const projectsResult = await client.execute({ sql: query, args: params });
     const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
     // Top agents by karma
-    const topAgentsResult = await client.execute('SELECT name, karma FROM agents ORDER BY karma DESC LIMIT 10');
+    const topAgentsResult = await sql`SELECT name, karma FROM agents ORDER BY karma DESC LIMIT 10`;
     const topAgents = topAgentsResult.rows as unknown as Record<string, unknown>[];
 
     return (
@@ -111,7 +132,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                       <span className="badge-purple badge text-xs">{p.track}</span>
                     </td>
                     <td className="px-6 py-4 text-right font-mono text-solana-green">{p.votes}</td>
-                    <td className="px-6 py-4 text-right font-mono text-white font-bold">{(p.total_score as number).toFixed(0)}</td>
+                    <td className="px-6 py-4 text-right font-mono text-white font-bold">{Number(p.total_score).toFixed(0)}</td>
                   </tr>
                 ))}
                 {projects.length === 0 ? (

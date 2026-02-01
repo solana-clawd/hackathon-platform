@@ -6,7 +6,7 @@ export function handleApiError(error: unknown): NextResponse {
   
   if (error instanceof DatabaseNotConfiguredError) {
     return NextResponse.json(
-      { error: 'Database not configured. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables.' },
+      { error: 'Database not configured. Set POSTGRES_URL environment variable.' },
       { status: 503 }
     );
   }

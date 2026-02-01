@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { handleApiError } from '@/lib/api-utils';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
@@ -7,7 +8,6 @@ import { seedDatabase } from '@/lib/seed';
 
 export async function POST(request: NextRequest) {
   try {
-    // Ensure seed on first request
     await seedDatabase();
 
     const body = await request.json();
@@ -21,10 +21,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name must be alphanumeric (underscores and hyphens allowed)' }, { status: 400 });
     }
 
-    const client = await getDb();
+    await getDb();
     
-    // Check uniqueness
-    const existing = await client.execute({ sql: 'SELECT id FROM agents WHERE name = ?', args: [name] });
+    const existing = await sql`SELECT id FROM agents WHERE name = ${name}`;
     if (existing.rows.length > 0) {
       return NextResponse.json({ error: 'Agent name already taken' }, { status: 409 });
     }
@@ -33,11 +32,8 @@ export async function POST(request: NextRequest) {
     const apiKey = 'hk_' + crypto.randomBytes(24).toString('hex');
     const claimCode = crypto.randomBytes(16).toString('hex');
 
-    await client.execute({
-      sql: `INSERT INTO agents (id, name, description, api_key, owner_name, claim_code, created_at, last_active)
-      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      args: [id, name, description || null, apiKey, owner_name || null, claimCode],
-    });
+    await sql`INSERT INTO agents (id, name, description, api_key, owner_name, claim_code, created_at, last_active)
+      VALUES (${id}, ${name}, ${description || null}, ${apiKey}, ${owner_name || null}, ${claimCode}, NOW(), NOW())`;
 
     return NextResponse.json({
       agent_id: id,

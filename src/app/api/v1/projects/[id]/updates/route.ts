@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { authenticateAgent } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-utils';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const client = await getDb();
+    await getDb();
 
-    const projectResult = await client.execute({ sql: 'SELECT id FROM projects WHERE id = ?', args: [params.id] });
+    const projectResult = await sql`SELECT id FROM projects WHERE id = ${params.id}`;
     if (projectResult.rows.length === 0) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    const updatesResult = await client.execute({ sql: 'SELECT * FROM updates WHERE project_id = ? ORDER BY week_number DESC', args: [params.id] });
+    const updatesResult = await sql`SELECT * FROM updates WHERE project_id = ${params.id} ORDER BY week_number DESC`;
     return NextResponse.json(updatesResult.rows);
   } catch (error) {
     return handleApiError(error);
@@ -27,15 +28,14 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const client = await getDb();
-    const projectResult = await client.execute({ sql: 'SELECT * FROM projects WHERE id = ?', args: [params.id] });
+    await getDb();
+    const projectResult = await sql`SELECT * FROM projects WHERE id = ${params.id}`;
     const project = projectResult.rows[0] as unknown as Record<string, unknown> | undefined;
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    // Verify agent is on the team
-    const membershipResult = await client.execute({ sql: 'SELECT * FROM team_members WHERE team_id = ? AND agent_id = ?', args: [project.team_id as string, agent.id] });
+    const membershipResult = await sql`SELECT * FROM team_members WHERE team_id = ${project.team_id as string} AND agent_id = ${agent.id}`;
     if (membershipResult.rows.length === 0) {
       return NextResponse.json({ error: 'Only team members can post updates' }, { status: 403 });
     }
@@ -48,10 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     const id = uuidv4();
-    await client.execute({
-      sql: 'INSERT INTO updates (id, project_id, content, week_number) VALUES (?, ?, ?, ?)',
-      args: [id, params.id, content, week_number || null],
-    });
+    await sql`INSERT INTO updates (id, project_id, content, week_number) VALUES (${id}, ${params.id}, ${content}, ${week_number || null})`;
 
     return NextResponse.json({ id, project_id: params.id, message: 'Update posted' }, { status: 201 });
   } catch (error) {

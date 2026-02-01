@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import ProjectCard from '@/components/ProjectCard';
 import DatabaseError from '@/components/DatabaseError';
@@ -9,27 +10,22 @@ export const dynamic = 'force-dynamic';
 export default async function ProjectsPage({ searchParams }: { searchParams: { track?: string; sort?: string } }) {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
     const tracks = ['DeFi', 'Infrastructure', 'Consumer', 'Gaming', 'DePIN', 'DAOs'];
     const activeTrack = searchParams.track || null;
     const sort = searchParams.sort || 'votes';
 
-    let query = `
-      SELECT p.*, t.name as team_name FROM projects p
-      LEFT JOIN teams t ON p.team_id = t.id
-      WHERE 1=1
-    `;
-    const params: (string | number | null)[] = [];
-
+    let result;
     if (activeTrack) {
-      query += ' AND p.track = ?';
-      params.push(activeTrack);
+      result = sort === 'newest'
+        ? await sql`SELECT p.*, t.name as team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.id WHERE p.track = ${activeTrack} ORDER BY p.created_at DESC`
+        : await sql`SELECT p.*, t.name as team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.id WHERE p.track = ${activeTrack} ORDER BY p.votes DESC`;
+    } else {
+      result = sort === 'newest'
+        ? await sql`SELECT p.*, t.name as team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.id ORDER BY p.created_at DESC`
+        : await sql`SELECT p.*, t.name as team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.id ORDER BY p.votes DESC`;
     }
-
-    query += sort === 'newest' ? ' ORDER BY p.created_at DESC' : ' ORDER BY p.votes DESC';
-
-    const result = await client.execute({ sql: query, args: params });
     const projects = result.rows as unknown as Record<string, unknown>[];
 
     return (

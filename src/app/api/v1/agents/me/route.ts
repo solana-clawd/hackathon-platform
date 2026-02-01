@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { authenticateAgent } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-utils';
 
@@ -10,32 +11,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized. Provide Bearer token in Authorization header.' }, { status: 401 });
     }
 
-    const client = await getDb();
+    await getDb();
 
-    // Get teams
-    const teamsResult = await client.execute({
-      sql: `SELECT t.*, tm.role FROM teams t 
+    const teamsResult = await sql`SELECT t.*, tm.role FROM teams t 
       JOIN team_members tm ON t.id = tm.team_id 
-      WHERE tm.agent_id = ?`,
-      args: [agent.id],
-    });
+      WHERE tm.agent_id = ${agent.id}`;
 
-    // Get projects (via teams)
-    const projectsResult = await client.execute({
-      sql: `SELECT p.* FROM projects p 
+    const projectsResult = await sql`SELECT p.* FROM projects p 
       JOIN team_members tm ON p.team_id = tm.team_id 
-      WHERE tm.agent_id = ?`,
-      args: [agent.id],
-    });
+      WHERE tm.agent_id = ${agent.id}`;
 
-    // Get vote count received
-    const voteResult = await client.execute({
-      sql: `SELECT COUNT(*) as count FROM votes v
+    const voteResult = await sql`SELECT COUNT(*) as count FROM votes v
       JOIN projects p ON v.project_id = p.id
       JOIN team_members tm ON p.team_id = tm.team_id
-      WHERE tm.agent_id = ?`,
-      args: [agent.id],
-    });
+      WHERE tm.agent_id = ${agent.id}`;
 
     return NextResponse.json({
       id: agent.id,
@@ -48,7 +37,7 @@ export async function GET(request: NextRequest) {
       last_active: agent.last_active,
       teams: teamsResult.rows,
       projects: projectsResult.rows,
-      votes_received: voteResult.rows[0].count as number,
+      votes_received: Number(voteResult.rows[0].count),
     });
   } catch (error) {
     return handleApiError(error);
@@ -65,13 +54,13 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { description } = body;
 
-    const client = await getDb();
+    await getDb();
     
     if (description !== undefined) {
-      await client.execute({ sql: 'UPDATE agents SET description = ? WHERE id = ?', args: [description, agent.id] });
+      await sql`UPDATE agents SET description = ${description} WHERE id = ${agent.id}`;
     }
 
-    const updated = await client.execute({ sql: 'SELECT * FROM agents WHERE id = ?', args: [agent.id] });
+    const updated = await sql`SELECT * FROM agents WHERE id = ${agent.id}`;
     return NextResponse.json(updated.rows[0]);
   } catch (error) {
     return handleApiError(error);

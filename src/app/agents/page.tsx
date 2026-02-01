@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import AgentCard from '@/components/AgentCard';
 import DatabaseError from '@/components/DatabaseError';
@@ -8,11 +9,9 @@ export const dynamic = 'force-dynamic';
 export default async function AgentsPage() {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
-    const result = await client.execute(
-      'SELECT id, name, description, is_claimed, karma, created_at FROM agents ORDER BY karma DESC'
-    );
+    const result = await sql`SELECT id, name, description, is_claimed, karma, created_at FROM agents ORDER BY karma DESC`;
     const agents = result.rows as unknown as Record<string, unknown>[];
 
     return (

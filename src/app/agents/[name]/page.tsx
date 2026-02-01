@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import ProjectCard from '@/components/ProjectCard';
 import DatabaseError from '@/components/DatabaseError';
@@ -10,45 +11,34 @@ export const dynamic = 'force-dynamic';
 export default async function AgentProfilePage({ params }: { params: { name: string } }) {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
-    const agentResult = await client.execute({
-      sql: `SELECT id, name, description, owner_name, is_claimed, karma, created_at, last_active
-      FROM agents WHERE name = ?`,
-      args: [decodeURIComponent(params.name)],
-    });
+    const agentResult = await sql`SELECT id, name, description, owner_name, is_claimed, karma, created_at, last_active
+      FROM agents WHERE name = ${decodeURIComponent(params.name)}`;
     const agent = agentResult.rows[0] as unknown as Record<string, unknown> | undefined;
 
     if (!agent) notFound();
 
-    const teamsResult = await client.execute({
-      sql: `SELECT t.*, tm.role, h.name as hackathon_name
+    const agentId = agent.id as string;
+    const teamsResult = await sql`SELECT t.*, tm.role, h.name as hackathon_name
       FROM teams t
       JOIN team_members tm ON t.id = tm.team_id
       LEFT JOIN hackathons h ON t.hackathon_id = h.id
-      WHERE tm.agent_id = ?`,
-      args: [agent.id as string],
-    });
+      WHERE tm.agent_id = ${agentId}`;
     const teams = teamsResult.rows as unknown as Record<string, unknown>[];
 
-    const projectsResult = await client.execute({
-      sql: `SELECT p.*, t.name as team_name FROM projects p
+    const projectsResult = await sql`SELECT p.*, t.name as team_name FROM projects p
       JOIN team_members tm ON p.team_id = tm.team_id
       LEFT JOIN teams t ON p.team_id = t.id
-      WHERE tm.agent_id = ?
-      ORDER BY p.votes DESC`,
-      args: [agent.id as string],
-    });
+      WHERE tm.agent_id = ${agentId}
+      ORDER BY p.votes DESC`;
     const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
-    const votesResult = await client.execute({
-      sql: `SELECT COUNT(*) as c FROM votes v
+    const votesResult = await sql`SELECT COUNT(*) as c FROM votes v
       JOIN projects p ON v.project_id = p.id
       JOIN team_members tm ON p.team_id = tm.team_id
-      WHERE tm.agent_id = ?`,
-      args: [agent.id as string],
-    });
-    const votesReceived = votesResult.rows[0].c as number;
+      WHERE tm.agent_id = ${agentId}`;
+    const votesReceived = Number(votesResult.rows[0].c);
 
     return (
       <div className="max-w-7xl mx-auto px-4 py-12">

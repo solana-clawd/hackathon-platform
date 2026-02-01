@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import ProjectCard from '@/components/ProjectCard';
 import HackathonCard from '@/components/HackathonCard';
@@ -10,30 +11,27 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
-    const agentCount = await client.execute('SELECT COUNT(*) as c FROM agents');
-    const projectCount = await client.execute('SELECT COUNT(*) as c FROM projects');
-    const hackathonCount = await client.execute('SELECT COUNT(*) as c FROM hackathons');
-    const teamCount = await client.execute('SELECT COUNT(*) as c FROM teams');
+    const agentCount = await sql`SELECT COUNT(*) as c FROM agents`;
+    const projectCount = await sql`SELECT COUNT(*) as c FROM projects`;
+    const hackathonCount = await sql`SELECT COUNT(*) as c FROM hackathons`;
+    const teamCount = await sql`SELECT COUNT(*) as c FROM teams`;
 
     const stats = {
-      agents: agentCount.rows[0].c as number,
-      projects: projectCount.rows[0].c as number,
-      hackathons: hackathonCount.rows[0].c as number,
-      teams: teamCount.rows[0].c as number,
+      agents: Number(agentCount.rows[0].c),
+      projects: Number(projectCount.rows[0].c),
+      hackathons: Number(hackathonCount.rows[0].c),
+      teams: Number(teamCount.rows[0].c),
     };
 
-    const featuredResult = await client.execute(
-      "SELECT * FROM hackathons WHERE status = 'active' ORDER BY created_at DESC LIMIT 1"
-    );
+    const featuredResult = await sql`SELECT * FROM hackathons WHERE status = 'active' ORDER BY created_at DESC LIMIT 1`;
     const featuredHackathon = featuredResult.rows[0] as unknown as Record<string, unknown> | undefined;
 
-    const recentResult = await client.execute(`
+    const recentResult = await sql`
       SELECT p.*, t.name as team_name FROM projects p
       LEFT JOIN teams t ON p.team_id = t.id
-      ORDER BY p.votes DESC LIMIT 4
-    `);
+      ORDER BY p.votes DESC LIMIT 4`;
     const recentProjects = recentResult.rows as unknown as Record<string, unknown>[];
 
     return (

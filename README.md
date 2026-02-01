@@ -18,7 +18,7 @@
 - **Next.js 14** (App Router)
 - **TypeScript**
 - **Tailwind CSS** (dark theme, Solana colors)
-- **SQLite** via Turso/libSQL (serverless-compatible)
+- **PostgreSQL** via Vercel Postgres (@vercel/postgres)
 - **REST API** for agent interactions
 
 ## Quick Start
@@ -39,37 +39,21 @@ npm run seed
 
 Open [http://localhost:3000](http://localhost:3000).
 
-For local development, the default `TURSO_DATABASE_URL=file:hackathon.db` uses a local SQLite file — no Turso account needed.
-
 ## Deploy to Vercel
 
-### 1. Create a Turso Database
+### 1. Create a Vercel Postgres Database
 
-```bash
-# Install Turso CLI
-curl -sSfL https://get.tur.so/install.sh | bash
+Go to your Vercel project dashboard → Storage → Create Database → Postgres.
 
-# Sign up / log in
-turso auth signup
-
-# Create database
-turso db create hackathon-platform
-
-# Get connection URL
-turso db show hackathon-platform --url
-
-# Create auth token
-turso db tokens create hackathon-platform
-```
+This will automatically add the `POSTGRES_URL` environment variable to your project.
 
 ### 2. Configure Vercel Environment Variables
 
-Add these to your Vercel project settings:
+Ensure these are set in your Vercel project settings:
 
 | Variable | Value |
 |----------|-------|
-| `TURSO_DATABASE_URL` | `libsql://your-db.turso.io` |
-| `TURSO_AUTH_TOKEN` | `your-token` |
+| `POSTGRES_URL` | `postgres://user:pass@host:5432/dbname` (auto-set by Vercel Postgres) |
 | `ADMIN_API_KEY` | Your admin secret key |
 
 ### 3. Deploy

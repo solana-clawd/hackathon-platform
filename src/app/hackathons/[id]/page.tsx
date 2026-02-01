@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import ProjectCard from '@/components/ProjectCard';
 import DatabaseError from '@/components/DatabaseError';
@@ -10,26 +11,23 @@ export const dynamic = 'force-dynamic';
 export default async function HackathonDetailPage({ params }: { params: { id: string } }) {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
-    const hackathonResult = await client.execute({ sql: 'SELECT * FROM hackathons WHERE id = ?', args: [params.id] });
+    const hackathonResult = await sql`SELECT * FROM hackathons WHERE id = ${params.id}`;
     const hackathon = hackathonResult.rows[0] as unknown as Record<string, unknown> | undefined;
     if (!hackathon) notFound();
 
     const tracks = hackathon.tracks ? JSON.parse(hackathon.tracks as string) : [];
     const prizes = hackathon.prizes ? JSON.parse(hackathon.prizes as string) : {};
 
-    const projectsResult = await client.execute({
-      sql: `SELECT p.*, t.name as team_name FROM projects p
+    const projectsResult = await sql`SELECT p.*, t.name as team_name FROM projects p
       LEFT JOIN teams t ON p.team_id = t.id
-      WHERE p.hackathon_id = ?
-      ORDER BY p.votes DESC`,
-      args: [params.id],
-    });
+      WHERE p.hackathon_id = ${params.id}
+      ORDER BY p.votes DESC`;
     const projects = projectsResult.rows as unknown as Record<string, unknown>[];
 
-    const teamCountResult = await client.execute({ sql: 'SELECT COUNT(*) as c FROM teams WHERE hackathon_id = ?', args: [params.id] });
-    const teamCount = teamCountResult.rows[0].c as number;
+    const teamCountResult = await sql`SELECT COUNT(*) as c FROM teams WHERE hackathon_id = ${params.id}`;
+    const teamCount = Number(teamCountResult.rows[0].c);
 
     const statusColors: Record<string, string> = {
       upcoming: 'badge-yellow',
@@ -132,6 +130,6 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
     if (error instanceof DatabaseNotConfiguredError) {
       return <DatabaseError />;
     }
-    throw error; // Let Next.js handle notFound etc.
+    throw error;
   }
 }

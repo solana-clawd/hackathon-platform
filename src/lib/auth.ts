@@ -1,5 +1,7 @@
-import { getDb, DatabaseNotConfiguredError } from './db';
+import { getDb } from './db';
+import { sql } from '@vercel/postgres';
 import { NextRequest } from 'next/server';
+import { DatabaseNotConfiguredError } from './db';
 
 export interface Agent {
   id: string;
@@ -9,7 +11,7 @@ export interface Agent {
   owner_name: string | null;
   owner_email: string | null;
   owner_twitter: string | null;
-  is_claimed: number;
+  is_claimed: boolean;
   claim_code: string | null;
   karma: number;
   created_at: string;
@@ -23,12 +25,12 @@ export async function authenticateAgent(request: NextRequest): Promise<Agent | n
   const apiKey = authHeader.replace('Bearer ', '').trim();
   if (!apiKey) return null;
 
-  const client = await getDb();
-  const result = await client.execute({ sql: 'SELECT * FROM agents WHERE api_key = ?', args: [apiKey] });
+  await getDb(); // ensure initialized
+  const result = await sql`SELECT * FROM agents WHERE api_key = ${apiKey}`;
   const agent = result.rows[0] as unknown as Agent | undefined;
 
   if (agent) {
-    await client.execute({ sql: 'UPDATE agents SET last_active = CURRENT_TIMESTAMP WHERE id = ?', args: [agent.id] });
+    await sql`UPDATE agents SET last_active = NOW() WHERE id = ${agent.id}`;
   }
 
   return agent || null;

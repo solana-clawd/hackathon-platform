@@ -1,4 +1,5 @@
 import { getDb } from './db';
+import { sql } from '@vercel/postgres';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
@@ -11,12 +12,11 @@ function generateClaimCode(): string {
 }
 
 export async function seedDatabase() {
-  const client = await getDb();
+  await getDb(); // ensure initialized
 
   // Check if already seeded
-  const existing = await client.execute('SELECT COUNT(*) as count FROM hackathons');
-  if ((existing.rows[0].count as number) > 0) {
-    console.log('Database already seeded, skipping...');
+  const existing = await sql`SELECT COUNT(*) as count FROM hackathons`;
+  if (Number(existing.rows[0].count) > 0) {
     return;
   }
 
@@ -28,28 +28,16 @@ export async function seedDatabase() {
   const startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const endDate = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000);
 
-  await client.execute({
-    sql: `INSERT INTO hackathons (id, name, description, start_date, end_date, tracks, prizes, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [
-      hackathonId,
-      'Solana AI Hackathon',
-      'Build the future of AI on Solana. Create AI agents, tools, and protocols that push the boundaries of what\'s possible on-chain. $50,000 in prizes across 6 tracks.',
-      startDate.toISOString(),
-      endDate.toISOString(),
-      JSON.stringify(['DeFi', 'Infrastructure', 'Consumer', 'Gaming', 'DePIN', 'DAOs']),
-      JSON.stringify({
-        'Grand Prize': '$15,000',
-        'DeFi': '$7,500',
-        'Infrastructure': '$7,500',
-        'Consumer': '$5,000',
-        'Gaming': '$5,000',
-        'DePIN': '$5,000',
-        'DAOs': '$5,000'
-      }),
-      'active'
-    ],
-  });
+  await sql`INSERT INTO hackathons (id, name, description, start_date, end_date, tracks, prizes, status)
+    VALUES (${hackathonId}, ${'Solana AI Hackathon'}, ${'Build the future of AI on Solana. Create AI agents, tools, and protocols that push the boundaries of what\'s possible on-chain. $50,000 in prizes across 6 tracks.'}, ${startDate.toISOString()}, ${endDate.toISOString()}, ${JSON.stringify(['DeFi', 'Infrastructure', 'Consumer', 'Gaming', 'DePIN', 'DAOs'])}, ${JSON.stringify({
+      'Grand Prize': '$15,000',
+      'DeFi': '$7,500',
+      'Infrastructure': '$7,500',
+      'Consumer': '$5,000',
+      'Gaming': '$5,000',
+      'DePIN': '$5,000',
+      'DAOs': '$5,000'
+    })}, ${'active'})`;
 
   // Create sample agents
   const agents = [
@@ -64,11 +52,9 @@ export async function seedDatabase() {
   for (const agent of agents) {
     const id = uuidv4();
     agentIds.push(id);
-    await client.execute({
-      sql: `INSERT INTO agents (id, name, description, api_key, owner_name, claim_code, karma, created_at, last_active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      args: [id, agent.name, agent.description, generateApiKey(), agent.owner_name, generateClaimCode(), Math.floor(Math.random() * 100)],
-    });
+    const karma = Math.floor(Math.random() * 100);
+    await sql`INSERT INTO agents (id, name, description, api_key, owner_name, claim_code, karma, created_at, last_active)
+      VALUES (${id}, ${agent.name}, ${agent.description}, ${generateApiKey()}, ${agent.owner_name}, ${generateClaimCode()}, ${karma}, NOW(), NOW())`;
   }
 
   // Create teams
@@ -85,18 +71,13 @@ export async function seedDatabase() {
     teamIds.push(teamId);
     const inviteCode = crypto.randomBytes(8).toString('hex');
 
-    await client.execute({
-      sql: `INSERT INTO teams (id, name, hackathon_id, invite_code, created_by, created_at)
-      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      args: [teamId, team.name, hackathonId, inviteCode, agentIds[team.agentIndices[0]]],
-    });
+    await sql`INSERT INTO teams (id, name, hackathon_id, invite_code, created_by, created_at)
+      VALUES (${teamId}, ${team.name}, ${hackathonId}, ${inviteCode}, ${agentIds[team.agentIndices[0]]}, NOW())`;
 
     for (let i = 0; i < team.agentIndices.length; i++) {
-      await client.execute({
-        sql: `INSERT INTO team_members (team_id, agent_id, role, joined_at)
-        VALUES (?, ?, ?, CURRENT_TIMESTAMP)`,
-        args: [teamId, agentIds[team.agentIndices[i]], i === 0 ? 'leader' : 'member'],
-      });
+      const role = i === 0 ? 'leader' : 'member';
+      await sql`INSERT INTO team_members (team_id, agent_id, role, joined_at)
+        VALUES (${teamId}, ${agentIds[team.agentIndices[i]]}, ${role}, NOW())`;
     }
   }
 
@@ -150,36 +131,15 @@ export async function seedDatabase() {
 
   for (const project of projects) {
     const projectId = uuidv4();
-    await client.execute({
-      sql: `INSERT INTO projects (id, name, description, track, repo_url, demo_url, tech_stack, team_id, hackathon_id, status, votes, submitted_at, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      args: [
-        projectId,
-        project.name,
-        project.description,
-        project.track,
-        project.repo_url,
-        project.demo_url || null,
-        project.tech_stack,
-        teamIds[project.teamIndex],
-        hackathonId,
-        project.status,
-        project.votes,
-        project.status === 'submitted' ? new Date().toISOString() : null,
-      ],
-    });
+    const submittedAt = project.status === 'submitted' ? new Date().toISOString() : null;
+    await sql`INSERT INTO projects (id, name, description, track, repo_url, demo_url, tech_stack, team_id, hackathon_id, status, votes, submitted_at, created_at)
+      VALUES (${projectId}, ${project.name}, ${project.description}, ${project.track}, ${project.repo_url}, ${project.demo_url}, ${project.tech_stack}, ${teamIds[project.teamIndex]}, ${hackathonId}, ${project.status}, ${project.votes}, ${submittedAt}, NOW())`;
 
     if (project.status === 'submitted') {
-      await client.execute({
-        sql: `INSERT INTO updates (id, project_id, content, week_number, created_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-        args: [
-          uuidv4(),
-          projectId,
-          `## Week 1 Progress\n\n- Set up project repository and CI/CD\n- Implemented core smart contract logic\n- Built initial frontend prototype\n- Integrated with Solana devnet\n\n### Next Steps\n- Complete testing suite\n- Deploy to mainnet-beta\n- Write documentation`,
-          1,
-        ],
-      });
+      const updateId = uuidv4();
+      const content = `## Week 1 Progress\n\n- Set up project repository and CI/CD\n- Implemented core smart contract logic\n- Built initial frontend prototype\n- Integrated with Solana devnet\n\n### Next Steps\n- Complete testing suite\n- Deploy to mainnet-beta\n- Write documentation`;
+      await sql`INSERT INTO updates (id, project_id, content, week_number, created_at)
+        VALUES (${updateId}, ${projectId}, ${content}, ${1}, NOW())`;
     }
   }
 

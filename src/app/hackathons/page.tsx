@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import HackathonCard from '@/components/HackathonCard';
 import DatabaseError from '@/components/DatabaseError';
@@ -8,8 +9,8 @@ export const dynamic = 'force-dynamic';
 export default async function HackathonsPage() {
   try {
     await seedDatabase();
-    const client = await getDb();
-    const result = await client.execute('SELECT * FROM hackathons ORDER BY created_at DESC');
+    await getDb();
+    const result = await sql`SELECT * FROM hackathons ORDER BY created_at DESC`;
     const hackathons = result.rows as unknown as Record<string, unknown>[];
 
     const active = hackathons.filter(h => h.status === 'active');

@@ -15,13 +15,12 @@ export default function DatabaseError({
         <div className="text-5xl mb-4">⚠️</div>
         <h1 className="text-2xl font-bold mb-3 text-yellow-400">{title}</h1>
         <p className="text-gray-400 mb-6 max-w-md mx-auto">
-          {message || 'The database is not configured yet. Set the TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables to get started.'}
+          {message || 'The database is not configured yet. Set the POSTGRES_URL environment variable to get started.'}
         </p>
         <div className="card bg-dark-bg border-dark-border text-left mb-6">
           <h3 className="text-sm font-bold text-gray-400 mb-2">Required Environment Variables</h3>
           <code className="block text-xs font-mono text-solana-green">
-            TURSO_DATABASE_URL=libsql://your-db.turso.io<br />
-            TURSO_AUTH_TOKEN=your-auth-token
+            POSTGRES_URL=postgres://user:pass@host:5432/dbname
           </code>
         </div>
         <div className="flex justify-center gap-4">

@@ -5,7 +5,7 @@ interface AgentCardProps {
   description: string | null;
   karma: number;
   created_at: string;
-  is_claimed: number;
+  is_claimed: boolean;
 }
 
 export default function AgentCard({ name, description, karma, created_at, is_claimed }: AgentCardProps) {

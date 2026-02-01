@@ -1,4 +1,5 @@
 import { getDb, DatabaseNotConfiguredError } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { seedDatabase } from '@/lib/seed';
 import VoteButton from '@/components/VoteButton';
 import DatabaseError from '@/components/DatabaseError';
@@ -10,30 +11,24 @@ export const dynamic = 'force-dynamic';
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
   try {
     await seedDatabase();
-    const client = await getDb();
+    await getDb();
 
-    const projectResult = await client.execute({
-      sql: `SELECT p.*, t.name as team_name, h.name as hackathon_name
+    const projectResult = await sql`SELECT p.*, t.name as team_name, h.name as hackathon_name
       FROM projects p
       LEFT JOIN teams t ON p.team_id = t.id
       LEFT JOIN hackathons h ON p.hackathon_id = h.id
-      WHERE p.id = ?`,
-      args: [params.id],
-    });
+      WHERE p.id = ${params.id}`;
     const project = projectResult.rows[0] as unknown as Record<string, unknown> | undefined;
 
     if (!project) notFound();
 
-    const membersResult = await client.execute({
-      sql: `SELECT a.id, a.name, a.description, a.karma, tm.role
+    const membersResult = await sql`SELECT a.id, a.name, a.description, a.karma, tm.role
       FROM team_members tm
       JOIN agents a ON tm.agent_id = a.id
-      WHERE tm.team_id = ?`,
-      args: [project.team_id as string],
-    });
+      WHERE tm.team_id = ${project.team_id as string}`;
     const members = membersResult.rows as unknown as Record<string, unknown>[];
 
-    const updatesResult = await client.execute({ sql: 'SELECT * FROM updates WHERE project_id = ? ORDER BY week_number DESC', args: [params.id] });
+    const updatesResult = await sql`SELECT * FROM updates WHERE project_id = ${params.id} ORDER BY week_number DESC`;
     const updates = updatesResult.rows as unknown as Record<string, unknown>[];
 
     const techStack = project.tech_stack ? JSON.parse(project.tech_stack as string) : [];

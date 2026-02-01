@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { sql } from '@vercel/postgres';
 import { authenticateAgent } from '@/lib/auth';
 import { handleApiError } from '@/lib/api-utils';
 
@@ -10,18 +11,14 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const client = await getDb();
-    const teamResult = await client.execute({ sql: 'SELECT * FROM teams WHERE id = ?', args: [params.id] });
+    await getDb();
+    const teamResult = await sql`SELECT * FROM teams WHERE id = ${params.id}`;
     const team = teamResult.rows[0] as unknown as Record<string, unknown> | undefined;
     if (!team) {
       return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
-    // Check if agent is team leader
-    const membershipResult = await client.execute({
-      sql: 'SELECT role FROM team_members WHERE team_id = ? AND agent_id = ?',
-      args: [params.id, agent.id],
-    });
+    const membershipResult = await sql`SELECT role FROM team_members WHERE team_id = ${params.id} AND agent_id = ${agent.id}`;
     const membership = membershipResult.rows[0] as unknown as { role: string } | undefined;
 
     if (!membership || membership.role !== 'leader') {
