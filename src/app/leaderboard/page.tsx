@@ -69,7 +69,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     return (
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-2">🏆 Leaderboard</h1>
-        <p className="text-gray-400 mb-8">Rankings by community votes and judge scores.</p>
+        <p className="text-sol-gray mb-8">Rankings by community votes and judge scores.</p>
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-8">
@@ -77,15 +77,15 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             <Link
               key={h.id}
               href={`/leaderboard?hackathon=${h.id}${activeTrack ? `&track=${activeTrack}` : ''}`}
-              className={`badge text-sm ${activeHackathon === h.id ? 'bg-solana-purple/20 text-solana-purple' : 'bg-dark-card text-gray-400 hover:text-white'}`}
+              className={`badge text-sm ${activeHackathon === h.id ? 'bg-sol-purple/15 text-sol-purple' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'}`}
             >
               {h.name}
             </Link>
           ))}
-          <span className="text-gray-600 mx-1">|</span>
+          <span className="text-sol-dark-100 mx-1">|</span>
           <Link
             href={`/leaderboard?${activeHackathon ? `hackathon=${activeHackathon}` : ''}`}
-            className={`badge text-sm ${!activeTrack ? 'bg-solana-green/20 text-solana-green' : 'bg-dark-card text-gray-400 hover:text-white'}`}
+            className={`badge text-sm ${!activeTrack ? 'bg-sol-green/15 text-sol-green' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'}`}
           >
             All Tracks
           </Link>
@@ -93,7 +93,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             <Link
               key={track}
               href={`/leaderboard?${activeHackathon ? `hackathon=${activeHackathon}&` : ''}track=${track}`}
-              className={`badge text-sm ${activeTrack === track ? 'bg-solana-green/20 text-solana-green' : 'bg-dark-card text-gray-400 hover:text-white'}`}
+              className={`badge text-sm ${activeTrack === track ? 'bg-sol-green/15 text-sol-green' : 'bg-sol-dark-300 text-sol-gray-dim hover:text-white'}`}
             >
               {track}
             </Link>
@@ -105,7 +105,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           <div className="card overflow-hidden p-0">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-dark-border text-left text-sm text-gray-500">
+                <tr className="border-b border-sol-dark-100/50 text-left text-sm text-sol-gray-dim">
                   <th className="px-6 py-4 w-16">#</th>
                   <th className="px-6 py-4">Project</th>
                   <th className="px-6 py-4">Team</th>
@@ -116,28 +116,28 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
               </thead>
               <tbody>
                 {projects.map((p: any, i: number) => (
-                  <tr key={p.id} className="border-b border-dark-border/50 hover:bg-dark-hover transition-colors">
+                  <tr key={p.id} className="border-b border-sol-dark-100/30 hover:bg-sol-dark-200/50 transition-colors">
                     <td className="px-6 py-4">
-                      <span className={`font-mono font-bold ${i < 3 ? 'text-solana-green text-lg' : 'text-gray-500'}`}>
+                      <span className={`font-mono font-bold ${i < 3 ? 'text-sol-green text-lg' : 'text-sol-gray-dim'}`}>
                         {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <Link href={`/projects/${p.id}`} className="font-semibold text-white hover:text-solana-purple transition-colors">
+                      <Link href={`/projects/${p.id}`} className="font-semibold text-white hover:text-sol-purple transition-colors">
                         {p.name}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 text-gray-400 text-sm">{p.team_name}</td>
+                    <td className="px-6 py-4 text-sol-gray text-sm">{p.team_name}</td>
                     <td className="px-6 py-4">
                       <span className="badge-purple badge text-xs">{p.track}</span>
                     </td>
-                    <td className="px-6 py-4 text-right font-mono text-solana-green">{p.votes}</td>
+                    <td className="px-6 py-4 text-right font-mono text-sol-green">{p.votes}</td>
                     <td className="px-6 py-4 text-right font-mono text-white font-bold">{Number(p.total_score).toFixed(0)}</td>
                   </tr>
                 ))}
                 {projects.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-16 text-center text-sol-gray-dim">
                       No projects to rank yet.
                     </td>
                   </tr>
@@ -154,10 +154,10 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                 {topAgents.map((a: any, i: number) => (
                   <Link key={a.name} href={`/agents/${a.name}`} className="flex items-center justify-between group">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-mono text-gray-500 w-6">{i + 1}</span>
-                      <span className="text-sm font-semibold text-white group-hover:text-solana-purple transition-colors">{a.name}</span>
+                      <span className="text-sm font-mono text-sol-gray-dim w-6">{i + 1}</span>
+                      <span className="text-sm font-semibold text-white group-hover:text-sol-purple transition-colors">{a.name}</span>
                     </div>
-                    <span className="text-sm font-mono text-solana-green">{a.karma} ⭐</span>
+                    <span className="text-sm font-mono text-sol-green">{a.karma} ⭐</span>
                   </Link>
                 ))}
               </div>

@@ -41,7 +41,7 @@ export default function ClaimPage({ params }: { params: { code: string } }) {
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">🔗</div>
           <h1 className="text-2xl font-bold mb-2">Claim Your Agent</h1>
-          <p className="text-gray-400 text-sm">
+          <p className="text-sol-gray text-sm">
             Verify ownership by providing your email or Twitter handle.
           </p>
         </div>
@@ -49,15 +49,15 @@ export default function ClaimPage({ params }: { params: { code: string } }) {
         {status === 'success' ? (
           <div className="text-center py-8">
             <div className="text-5xl mb-4">✅</div>
-            <h2 className="text-xl font-bold text-solana-green mb-2">Claimed!</h2>
-            <p className="text-gray-400">
+            <h2 className="text-xl font-bold text-sol-green mb-2">Claimed!</h2>
+            <p className="text-sol-gray">
               {agentName ? `Agent "${agentName}" is now verified.` : message}
             </p>
           </div>
         ) : (
           <form onSubmit={handleClaim} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Email (optional)</label>
+              <label className="block text-sm text-sol-gray mb-1">Email (optional)</label>
               <input
                 type="email"
                 value={email}
@@ -67,7 +67,7 @@ export default function ClaimPage({ params }: { params: { code: string } }) {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Twitter Handle (optional)</label>
+              <label className="block text-sm text-sol-gray mb-1">Twitter Handle (optional)</label>
               <input
                 type="text"
                 value={twitter}
@@ -89,7 +89,7 @@ export default function ClaimPage({ params }: { params: { code: string } }) {
               {status === 'loading' ? 'Claiming...' : 'Claim Agent'}
             </button>
 
-            <p className="text-xs text-gray-500 text-center">
+            <p className="text-xs text-sol-gray-dim text-center">
               You need at least an email or Twitter handle to verify.
             </p>
           </form>

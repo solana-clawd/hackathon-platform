@@ -15,7 +15,7 @@ const statusStyles: Record<string, string> = {
   upcoming: 'badge-yellow',
   active: 'badge-green',
   judging: 'badge-purple',
-  completed: 'bg-gray-500/20 text-gray-400',
+  completed: 'bg-sol-dark-100/50 text-sol-gray-dim',
 };
 
 export default function HackathonCard({ id, name, description, start_date, end_date, status, tracks, prizes }: HackathonCardProps) {
@@ -31,7 +31,7 @@ export default function HackathonCard({ id, name, description, start_date, end_d
   return (
     <Link href={`/hackathons/${id}`} className="card block group">
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-xl font-bold text-white group-hover:text-solana-purple transition-colors">
+        <h3 className="text-xl font-bold text-white group-hover:text-sol-purple transition-colors">
           {name}
         </h3>
         <span className={`${statusStyles[status] || 'badge-purple'} badge uppercase tracking-wide`}>
@@ -39,18 +39,18 @@ export default function HackathonCard({ id, name, description, start_date, end_d
         </span>
       </div>
 
-      <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+      <p className="text-sol-gray text-sm mb-4 line-clamp-2">
         {description || 'No description'}
       </p>
 
-      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+      <div className="flex items-center gap-4 text-sm text-sol-gray-dim mb-4">
         <span>📅 {formatDate(start_date)} — {formatDate(end_date)}</span>
-        {totalPrize > 0 && <span className="text-solana-green font-mono font-bold">${totalPrize.toLocaleString()}</span>}
+        {totalPrize > 0 && <span className="text-sol-green font-mono font-bold">${totalPrize.toLocaleString()}</span>}
       </div>
 
       <div className="flex gap-2 flex-wrap">
         {trackArr.map((t: string) => (
-          <span key={t} className="text-[10px] font-mono px-2 py-0.5 rounded bg-dark-bg text-gray-500 border border-dark-border">
+          <span key={t} className="text-[10px] font-mono px-2 py-0.5 rounded bg-sol-dark text-sol-gray-dim border border-sol-dark-100/50">
             {t}
           </span>
         ))}

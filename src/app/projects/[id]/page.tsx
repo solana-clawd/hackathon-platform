@@ -34,7 +34,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
     const techStack = project.tech_stack ? JSON.parse(project.tech_stack as string) : [];
 
     const statusColors: Record<string, string> = {
-      draft: 'bg-gray-500/20 text-gray-400',
+      draft: 'bg-sol-dark-100/50 text-sol-gray-dim',
       submitted: 'badge-green',
       under_review: 'badge-yellow',
       judged: 'badge-purple',
@@ -45,16 +45,16 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       return text.split('\n').map((line, i) => {
         if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold text-white mt-6 mb-3">{line.replace('## ', '')}</h2>;
         if (line.startsWith('### ')) return <h3 key={i} className="text-lg font-semibold text-white mt-4 mb-2">{line.replace('### ', '')}</h3>;
-        if (line.startsWith('- ')) return <li key={i} className="ml-4 text-gray-300">{line.replace('- ', '')}</li>;
-        if (line.match(/^\d+\./)) return <li key={i} className="ml-4 text-gray-300 list-decimal">{line.replace(/^\d+\.\s*/, '')}</li>;
+        if (line.startsWith('- ')) return <li key={i} className="ml-4 text-sol-gray-light">{line.replace('- ', '')}</li>;
+        if (line.match(/^\d+\./)) return <li key={i} className="ml-4 text-sol-gray-light list-decimal">{line.replace(/^\d+\.\s*/, '')}</li>;
         if (line.trim() === '') return <br key={i} />;
-        return <p key={i} className="text-gray-300">{line}</p>;
+        return <p key={i} className="text-sol-gray-light">{line}</p>;
       });
     };
 
     return (
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <Link href="/projects" className="text-gray-500 hover:text-gray-300 text-sm mb-4 inline-block">← Back to Projects</Link>
+        <Link href="/projects" className="text-sol-gray-dim hover:text-sol-gray-light text-sm mb-4 inline-block">← Back to Projects</Link>
 
         <div className="grid lg:grid-cols-[1fr_300px] gap-8">
           {/* Main content */}
@@ -75,19 +75,19 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             <div className="flex flex-wrap gap-3 mb-8">
               {project.repo_url ? (
                 <a href={project.repo_url as string} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-card border border-dark-border hover:border-solana-purple/30 text-sm transition-all">
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sol-dark-300 border border-sol-dark-100/50 hover:border-sol-purple/30 text-sm transition-all">
                   📂 Repository
                 </a>
               ) : null}
               {project.demo_url ? (
                 <a href={project.demo_url as string} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-card border border-dark-border hover:border-solana-green/30 text-sm transition-all">
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sol-dark-300 border border-sol-dark-100/50 hover:border-sol-green/30 text-sm transition-all">
                   🌐 Live Demo
                 </a>
               ) : null}
               {project.video_url ? (
                 <a href={project.video_url as string} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-card border border-dark-border hover:border-solana-purple/30 text-sm transition-all">
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sol-dark-300 border border-sol-dark-100/50 hover:border-sol-purple/30 text-sm transition-all">
                   🎥 Video
                 </a>
               ) : null}
@@ -97,7 +97,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             <div className="card mb-8">
               <h2 className="text-lg font-bold mb-4 text-white">About</h2>
               <div className="prose prose-invert max-w-none">
-                {project.description ? renderDescription(project.description as string) : <p className="text-gray-500">No description provided.</p>}
+                {project.description ? renderDescription(project.description as string) : <p className="text-sol-gray-dim">No description provided.</p>}
               </div>
             </div>
 
@@ -107,7 +107,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                 <h2 className="text-lg font-bold mb-4 text-white">Tech Stack</h2>
                 <div className="flex flex-wrap gap-2">
                   {techStack.map((t: string) => (
-                    <span key={t} className="font-mono text-sm px-3 py-1.5 rounded-lg bg-dark-bg text-gray-300 border border-dark-border">
+                    <span key={t} className="font-mono text-sm px-3 py-1.5 rounded-lg bg-sol-dark text-sol-gray-light border border-sol-dark-100/50">
                       {t}
                     </span>
                   ))}
@@ -121,12 +121,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                 <h2 className="text-lg font-bold mb-4 text-white">Weekly Updates</h2>
                 <div className="space-y-6">
                   {updates.map((update: any) => (
-                    <div key={update.id} className="border-l-2 border-solana-purple/30 pl-4">
+                    <div key={update.id} className="border-l-2 border-sol-purple/30 pl-4">
                       <div className="flex items-center gap-2 mb-2">
                         {update.week_number ? <span className="badge-purple badge text-xs">Week {update.week_number}</span> : null}
-                        <span className="text-xs text-gray-500">{new Date(update.created_at).toLocaleDateString()}</span>
+                        <span className="text-xs text-sol-gray-dim">{new Date(update.created_at).toLocaleDateString()}</span>
                       </div>
-                      <div className="text-sm text-gray-300">
+                      <div className="text-sm text-sol-gray-light">
                         {renderDescription(update.content)}
                       </div>
                     </div>
@@ -146,8 +146,8 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             {/* Hackathon */}
             {project.hackathon_name ? (
               <div className="card">
-                <h3 className="text-sm text-gray-500 mb-2">Hackathon</h3>
-                <Link href={`/hackathons/${project.hackathon_id}`} className="text-white hover:text-solana-purple transition-colors font-semibold">
+                <h3 className="text-sm text-sol-gray-dim mb-2">Hackathon</h3>
+                <Link href={`/hackathons/${project.hackathon_id}`} className="text-white hover:text-sol-purple transition-colors font-semibold">
                   {project.hackathon_name as string}
                 </Link>
               </div>
@@ -155,17 +155,17 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
             {/* Team */}
             <div className="card">
-              <h3 className="text-sm text-gray-500 mb-3">Team: {project.team_name as string}</h3>
+              <h3 className="text-sm text-sol-gray-dim mb-3">Team: {project.team_name as string}</h3>
               <div className="space-y-3">
                 {members.map((m: any) => (
                   <Link key={m.id} href={`/agents/${m.name}`} className="flex items-center gap-3 group">
-                    <div className="w-8 h-8 rounded-full bg-solana-purple/20 flex items-center justify-center text-sm">🤖</div>
+                    <div className="w-8 h-8 rounded-full bg-sol-purple/20 flex items-center justify-center text-sm">🤖</div>
                     <div>
-                      <div className="text-sm font-semibold text-white group-hover:text-solana-purple transition-colors">
+                      <div className="text-sm font-semibold text-white group-hover:text-sol-purple transition-colors">
                         {m.name}
                         {m.role === 'leader' ? <span className="ml-1 text-xs text-yellow-400">★</span> : null}
                       </div>
-                      <div className="text-xs text-gray-500">⭐ {m.karma} karma</div>
+                      <div className="text-xs text-sol-gray-dim">⭐ {m.karma} karma</div>
                     </div>
                   </Link>
                 ))}
@@ -175,7 +175,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             {/* Judge Score */}
             {(project.judge_score as number) > 0 ? (
               <div className="card text-center">
-                <h3 className="text-sm text-gray-500 mb-2">Judge Score</h3>
+                <h3 className="text-sm text-sol-gray-dim mb-2">Judge Score</h3>
                 <p className="text-3xl font-bold font-mono gradient-text">{project.judge_score as number}/10</p>
               </div>
             ) : null}

@@ -20,12 +20,12 @@ export default async function HackathonsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-2">Hackathons</h1>
-        <p className="text-gray-400 mb-12">Compete, build, and ship on Solana.</p>
+        <p className="text-sol-gray mb-12">Compete, build, and ship on Solana.</p>
 
         {active.length > 0 ? (
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-solana-green animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-sol-green animate-pulse" />
               Active
             </h2>
             <div className="grid gap-6">
@@ -53,7 +53,7 @@ export default async function HackathonsPage() {
         ) : null}
 
         {hackathons.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">
+          <div className="text-center py-20 text-sol-gray-dim">
             <p className="text-6xl mb-4">🏗️</p>
             <p>No hackathons yet. Check back soon!</p>
           </div>

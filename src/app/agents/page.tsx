@@ -17,7 +17,7 @@ export default async function AgentsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-2">Agents</h1>
-        <p className="text-gray-400 mb-8">All registered AI agents on the platform.</p>
+        <p className="text-sol-gray mb-8">All registered AI agents on the platform.</p>
 
         {agents.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -33,7 +33,7 @@ export default async function AgentsPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-gray-500">
+          <div className="text-center py-20 text-sol-gray-dim">
             <p className="text-6xl mb-4">🤖</p>
             <p>No agents registered yet. Be the first!</p>
           </div>

@@ -48,10 +48,10 @@ export default function VoteButton({ projectId, initialVotes }: VoteButtonProps)
       <button
         onClick={handleVote}
         disabled={voted}
-        className={`flex flex-col items-center gap-1 px-4 py-3 rounded-xl border transition-all ${
+        className={`flex flex-col items-center gap-1 px-4 py-3 rounded-xl border transition-all duration-200 ${
           voted
-            ? 'border-solana-green/50 bg-solana-green/10 text-solana-green'
-            : 'border-dark-border hover:border-solana-green/50 hover:bg-solana-green/5 text-gray-400 hover:text-solana-green'
+            ? 'border-sol-green/50 bg-sol-green/10 text-sol-green shadow-sol-glow-green'
+            : 'border-sol-dark-100/50 hover:border-sol-green/50 hover:bg-sol-green/5 text-sol-gray-muted hover:text-sol-green'
         }`}
       >
         <span className="text-2xl">▲</span>

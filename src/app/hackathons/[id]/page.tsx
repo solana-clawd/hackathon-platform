@@ -33,7 +33,7 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
       upcoming: 'badge-yellow',
       active: 'badge-green',
       judging: 'badge-purple',
-      completed: 'bg-gray-500/20 text-gray-400',
+      completed: 'bg-sol-dark-100/50 text-sol-gray-dim',
     };
 
     const formatDate = (d: string | null) => d ? new Date(d as string).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
@@ -42,11 +42,11 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-12">
-          <Link href="/hackathons" className="text-gray-500 hover:text-gray-300 text-sm mb-4 inline-block">← Back to Hackathons</Link>
+          <Link href="/hackathons" className="text-sol-gray-dim hover:text-sol-gray-light text-sm mb-4 inline-block">← Back to Hackathons</Link>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-4xl font-bold mb-2">{hackathon.name as string}</h1>
-              <p className="text-gray-400 max-w-2xl">{hackathon.description as string}</p>
+              <p className="text-sol-gray max-w-2xl">{hackathon.description as string}</p>
             </div>
             <span className={`badge uppercase tracking-wide ${statusColors[hackathon.status as string] || 'badge-purple'}`}>
               {hackathon.status as string}
@@ -57,19 +57,19 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
         {/* Info cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="card">
-            <h3 className="text-sm text-gray-500 mb-2">Timeline</h3>
+            <h3 className="text-sm text-sol-gray-dim mb-2">Timeline</h3>
             <p className="font-mono text-sm">
               {formatDate(hackathon.start_date as string)} — {formatDate(hackathon.end_date as string)}
             </p>
           </div>
           <div className="card">
-            <h3 className="text-sm text-gray-500 mb-2">Participants</h3>
+            <h3 className="text-sm text-sol-gray-dim mb-2">Participants</h3>
             <p className="font-mono text-2xl font-bold gradient-text">{teamCount} teams</p>
-            <p className="text-sm text-gray-500">{projects.length} projects submitted</p>
+            <p className="text-sm text-sol-gray-dim">{projects.length} projects submitted</p>
           </div>
           <div className="card">
-            <h3 className="text-sm text-gray-500 mb-2">Total Prizes</h3>
-            <p className="font-mono text-2xl font-bold text-solana-green">
+            <h3 className="text-sm text-sol-gray-dim mb-2">Total Prizes</h3>
+            <p className="font-mono text-2xl font-bold text-sol-green">
               {Object.values(prizes).length > 0 ? Object.values(prizes)[0] as string : 'TBD'}
             </p>
           </div>
@@ -82,7 +82,7 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
             {tracks.map((track: string) => (
               <div key={track} className="card flex items-center justify-between">
                 <span className="font-semibold">{track}</span>
-                {prizes[track] ? <span className="font-mono text-solana-green text-sm">{prizes[track]}</span> : null}
+                {prizes[track] ? <span className="font-mono text-sol-green text-sm">{prizes[track]}</span> : null}
               </div>
             ))}
           </div>
@@ -95,9 +95,9 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
             <div className="card">
               <div className="space-y-3">
                 {Object.entries(prizes).map(([name, amount]) => (
-                  <div key={name} className="flex items-center justify-between py-2 border-b border-dark-border last:border-0">
+                  <div key={name} className="flex items-center justify-between py-2 border-b border-sol-dark-100/50 last:border-0">
                     <span className="font-medium">{name}</span>
-                    <span className="font-mono text-solana-green font-bold">{amount as string}</span>
+                    <span className="font-mono text-sol-green font-bold">{amount as string}</span>
                   </div>
                 ))}
               </div>
@@ -109,7 +109,7 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">Projects ({projects.length})</h2>
-            <Link href={`/leaderboard?hackathon=${params.id}`} className="text-solana-purple hover:underline text-sm">
+            <Link href={`/leaderboard?hackathon=${params.id}`} className="text-sol-purple hover:underline text-sm">
               View Leaderboard →
             </Link>
           </div>
@@ -118,7 +118,7 @@ export default async function HackathonDetailPage({ params }: { params: { id: st
               {projects.map((p: any) => <ProjectCard key={p.id} {...p} />)}
             </div>
           ) : (
-            <div className="text-center py-16 text-gray-500 card">
+            <div className="text-center py-16 text-sol-gray-dim card">
               <p className="text-4xl mb-4">🏗️</p>
               <p>No projects submitted yet. Be the first!</p>
             </div>

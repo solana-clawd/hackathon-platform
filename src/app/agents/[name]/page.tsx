@@ -45,7 +45,7 @@ export default async function AgentProfilePage({ params }: { params: { name: str
         {/* Profile header */}
         <div className="card mb-8">
           <div className="flex items-start gap-6 flex-wrap">
-            <div className="w-20 h-20 rounded-full bg-solana-purple/20 flex items-center justify-center text-4xl">
+            <div className="w-20 h-20 rounded-full bg-sol-purple/20 flex items-center justify-center text-4xl">
               🤖
             </div>
             <div className="flex-1 min-w-[200px]">
@@ -54,28 +54,28 @@ export default async function AgentProfilePage({ params }: { params: { name: str
                 {agent.is_claimed ? (
                   <span className="badge-green badge">verified</span>
                 ) : (
-                  <span className="badge bg-gray-500/20 text-gray-400">unclaimed</span>
+                  <span className="badge bg-sol-dark-100/50 text-sol-gray-dim">unclaimed</span>
                 )}
               </div>
-              <p className="text-gray-400 mb-4">{agent.description as string || 'No description'}</p>
-              {agent.owner_name ? <p className="text-sm text-gray-500">Owner: {String(agent.owner_name)}</p> : null}
+              <p className="text-sol-gray mb-4">{agent.description as string || 'No description'}</p>
+              {agent.owner_name ? <p className="text-sm text-sol-gray-dim">Owner: {String(agent.owner_name)}</p> : null}
             </div>
             <div className="grid grid-cols-3 gap-6 text-center">
               <div>
                 <div className="text-2xl font-bold font-mono gradient-text">{agent.karma as number}</div>
-                <div className="text-xs text-gray-500">Karma</div>
+                <div className="text-xs text-sol-gray-dim">Karma</div>
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono gradient-text">{votesReceived}</div>
-                <div className="text-xs text-gray-500">Votes Received</div>
+                <div className="text-xs text-sol-gray-dim">Votes Received</div>
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono gradient-text">{projects.length}</div>
-                <div className="text-xs text-gray-500">Projects</div>
+                <div className="text-xs text-sol-gray-dim">Projects</div>
               </div>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-dark-border flex items-center gap-4 text-xs text-gray-500">
+          <div className="mt-4 pt-4 border-t border-sol-dark-100/50 flex items-center gap-4 text-xs text-sol-gray-dim">
             <span>Joined {new Date(agent.created_at as string).toLocaleDateString()}</span>
             {agent.last_active ? <span>Last active {new Date(agent.last_active as string).toLocaleDateString()}</span> : null}
           </div>
@@ -90,8 +90,8 @@ export default async function AgentProfilePage({ params }: { params: { name: str
                 <Link key={t.id} href={`/hackathons/${t.hackathon_id}`} className="card block group">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white group-hover:text-solana-purple transition-colors">{t.name}</h3>
-                      <p className="text-sm text-gray-500">{t.hackathon_name}</p>
+                      <h3 className="font-bold text-white group-hover:text-sol-purple transition-colors">{t.name}</h3>
+                      <p className="text-sm text-sol-gray-dim">{t.hackathon_name}</p>
                     </div>
                     <span className="badge-purple badge text-xs">{t.role}</span>
                   </div>
@@ -112,7 +112,7 @@ export default async function AgentProfilePage({ params }: { params: { name: str
         ) : null}
 
         {projects.length === 0 && teams.length === 0 ? (
-          <div className="text-center py-16 text-gray-500 card">
+          <div className="text-center py-16 text-sol-gray-dim card">
             <p className="text-4xl mb-4">🏗️</p>
             <p>This agent hasn&apos;t joined any hackathons yet.</p>
           </div>
